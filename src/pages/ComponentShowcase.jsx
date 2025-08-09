@@ -5,26 +5,48 @@ import { Link } from "react-router-dom";
 // Dinamikus komponens importálás
 const loadComponents = async () => {
   try {
-    // Vite glob import - runtime-ban betölti a komponenseket
+    // Vite glob import - runtime-ban betölti a komponenseket a helyes útvonalakról
     const componentModules = import.meta.glob([
-      "/src/components/**/*.jsx",
-      "/src/components/**/*.tsx", 
-      "/src/widgets/**/*.jsx",
-      "/src/widgets/**/*.tsx"
+      "/_imports/liga-soccer-cra/src/components/**/*.jsx",
+      "/_imports/liga-soccer-cra/src/components/**/*.tsx", 
+      "/_imports/liga-soccer-cra/src/widgets/**/*.jsx",
+      "/_imports/liga-soccer-cra/src/widgets/**/*.tsx"
     ]);
+
+    console.log('Available component modules:', Object.keys(componentModules));
+
+    // Ha nincsenek talált modulok, próbálkozzunk más útvonalakkal
+    if (Object.keys(componentModules).length === 0) {
+      console.warn('No components found with standard paths, trying alternative paths...');
+      
+      // Próbálkozzunk relatív útvonallal
+      const altModules = import.meta.glob([
+        "../_imports/liga-soccer-cra/src/components/**/*.jsx",
+        "../_imports/liga-soccer-cra/src/components/**/*.tsx", 
+        "../_imports/liga-soccer-cra/src/widgets/**/*.jsx",
+        "../_imports/liga-soccer-cra/src/widgets/**/*.tsx"
+      ]);
+      
+      console.log('Alternative modules found:', Object.keys(altModules));
+      Object.assign(componentModules, altModules);
+    }
 
     const loadedComponents = await Promise.allSettled(
       Object.entries(componentModules).map(async ([path, moduleLoader]) => {
         try {
+          console.log('Loading component from path:', path);
           const module = await moduleLoader();
           const fileName = path.split("/").pop()?.replace(/\.(jsx|tsx)$/, "") || "Unknown";
+          
+          console.log('Module loaded:', { path, fileName, hasDefault: !!module.default });
           
           return {
             id: path,
             name: fileName,
             path: path,
             Component: module.default || module[fileName],
-            category: path.includes('/widgets/') ? 'Widget' : 'Component'
+            category: path.includes('/widgets/') ? 'Widget' : 'Component',
+            fullPath: path.replace('/_imports/liga-soccer-cra/src/', '')
           };
         } catch (error) {
           console.warn(`Failed to load component from ${path}:`, error);
@@ -32,6 +54,9 @@ const loadComponents = async () => {
         }
       })
     );
+
+    console.log('Available component modules:', Object.keys(componentModules));
+    console.log('Loaded components result:', loadedComponents);
 
     return loadedComponents
       .filter(result => result.status === 'fulfilled' && result.value && result.value.Component)
@@ -209,11 +234,31 @@ export default function ComponentShowcase() {
             <div className="text-gray-400 mb-4">
               <Search className="w-12 h-12 mx-auto" />
             </div>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-lg mb-4">
               {searchTerm || selectedCategory !== "all" 
                 ? "Nincs megfelelő komponens a szűrési feltételeknek."
-                : "Nincsenek betöltött komponensek."}
+                : `Nincsenek betöltött komponensek${components.length === 0 ? '.' : ' a szűrők alapján.'}`}
             </p>
+            
+            {components.length === 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-2xl mx-auto">
+                <h3 className="font-semibold text-yellow-800 mb-2">🔍 Komponens keresési útmutatás</h3>
+                <div className="text-sm text-yellow-700 space-y-2 text-left">
+                  <p><strong>Keresett útvonalak:</strong></p>
+                  <ul className="list-disc list-inside space-y-1 font-mono text-xs">
+                    <li>/_imports/liga-soccer-cra/src/components/**/*.jsx</li>
+                    <li>/_imports/liga-soccer-cra/src/widgets/**/*.jsx</li>
+                  </ul>
+                  <p className="pt-2"><strong>Ellenőrizd:</strong></p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>A komponensek a megfelelő mappában vannak-e</li>
+                    <li>A fájlok .jsx vagy .tsx kiterjesztésűek-e</li>
+                    <li>Van-e default export a komponensekben</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+            
             {(searchTerm || selectedCategory !== "all") && (
               <button
                 onClick={() => {
@@ -252,7 +297,7 @@ export default function ComponentShowcase() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 truncate" title={component.path}>
-                    {component.path}
+                    {component.fullPath || component.path}
                   </p>
                 </div>
 
