@@ -5,9 +5,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import ComponentShowcase from "./pages/ComponentShowcase"; // 👈 ÚJ IMPORT
+import ComponentShowcase from "./pages/ComponentShowcase";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -17,8 +24,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/showcase" element={<ComponentShowcase />} /> {/* 👈 ÚJ ROUTE */}
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/showcase" element={<ComponentShowcase />} />
+          {/* Egyéb custom route-ok itt */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
