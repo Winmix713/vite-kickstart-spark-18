@@ -38,13 +38,27 @@ const loadComponents = async () => {
           const module = await moduleLoader();
           const fileName = path.split("/").pop()?.replace(/\.(jsx|tsx)$/, "") || "Unknown";
           
-          console.log('Module loaded:', { path, fileName, hasDefault: !!module.default });
+          // Ellenőrizzük, hogy van-e használható export
+          const ComponentToUse = module.default || module[fileName];
+          
+          if (!ComponentToUse) {
+            console.warn(`No usable export found in ${path}`);
+            return null;
+          }
+          
+          // Ellenőrizzük, hogy React komponens-e
+          if (typeof ComponentToUse !== 'function' && typeof ComponentToUse !== 'object') {
+            console.warn(`${path} export is not a React component`);
+            return null;
+          }
+          
+          console.log('Module loaded:', { path, fileName, hasDefault: !!module.default, type: typeof ComponentToUse });
           
           return {
             id: path,
             name: fileName,
             path: path,
-            Component: module.default || module[fileName],
+            Component: ComponentToUse,
             category: path.includes('/widgets/') ? 'Widget' : 'Component',
             fullPath: path.replace('/_imports/liga-soccer-cra/src/', '')
           };
@@ -67,35 +81,129 @@ const loadComponents = async () => {
   }
 };
 
+// React Error Boundary komponens
+class ComponentErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error(`Error in component ${this.props.name}:`, error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center p-6 text-red-500 bg-red-50 rounded-lg border border-red-200">
+          <AlertCircle className="w-6 h-6 mb-2" />
+          <span className="font-medium mb-1">Renderelési hiba</span>
+          <span className="text-sm text-red-400 text-center">
+            {this.props.name}: {this.state.error?.message || 'Ismeretlen hiba'}
+          </span>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 // Hibakezelő komponens wrapper
 const ComponentWrapper = ({ Component, name }) => {
   const [hasError, setHasError] = useState(false);
+  const [renderAttempted, setRenderAttempted] = useState(false);
 
   if (hasError) {
     return (
-      <div className="flex items-center justify-center p-8 text-red-500 bg-red-50 rounded-lg border border-red-200">
-        <AlertCircle className="w-5 h-5 mr-2" />
-        <span>Hiba történt a {name} komponens betöltésekor</span>
+      <div className="flex flex-col items-center justify-center p-6 text-orange-500 bg-orange-50 rounded-lg border border-orange-200">
+        <AlertCircle className="w-6 h-6 mb-2" />
+        <span className="font-medium mb-1">Betöltési hiba</span>
+        <span className="text-sm text-orange-400 text-center">
+          {name} komponens nem renderelhető
+        </span>
       </div>
     );
   }
 
-  try {
+  if (!Component) {
     return (
+      <div className="flex flex-col items-center justify-center p-6 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
+        <AlertCircle className="w-6 h-6 mb-2" />
+        <span className="font-medium mb-1">Nincs komponens</span>
+        <span className="text-sm text-gray-400 text-center">
+          {name}: Nincs default export
+        </span>
+      </div>
+    );
+  }
+
+  const SafeComponent = () => {
+    try {
+      // Alapvető props-ok biztosítása
+      const defaultProps = {
+        // Gyakran használt props-ok
+        children: "Preview",
+        className: "",
+        style: {},
+        // MUI specifikus props-ok
+        variant: "contained",
+        color: "primary",
+        size: "medium",
+        disabled: false,
+        // További általános props-ok
+        onClick: () => {},
+        onChange: () => {},
+        onClose: () => {},
+        // Ha a komponens furcsa props-okat vár
+        ...Component.defaultProps
+      };
+
+      // Próbáljunk meg különböző props kombinációkat
+      const ComponentWithProps = () => {
+        try {
+          return <Component {...defaultProps} />;
+        } catch (error) {
+          // Próbáljuk props nélkül
+          try {
+            return <Component />;
+          } catch (secondError) {
+            // Próbáljunk csak children prop-pal
+            try {
+              return <Component>Előnézet</Component>;
+            } catch (thirdError) {
+              throw new Error(`Multiple render attempts failed: ${error.message}`);
+            }
+          }
+        }
+      };
+
+      return <ComponentWithProps />;
+    } catch (error) {
+      console.error(`Error rendering ${name}:`, error);
+      setHasError(true);
+      return null;
+    }
+  };
+
+  return (
+    <ComponentErrorBoundary name={name}>
       <Suspense fallback={
         <div className="flex items-center justify-center p-8">
           <Loader className="w-5 h-5 animate-spin mr-2" />
-          <span>Betöltés...</span>
+          <span className="text-sm text-gray-500">Betöltés...</span>
         </div>
       }>
-        <Component />
+        <div className="w-full h-full min-h-[100px] flex items-center justify-center">
+          <SafeComponent />
+        </div>
       </Suspense>
-    );
-  } catch (error) {
-    console.error(`Error rendering ${name}:`, error);
-    setHasError(true);
-    return null;
-  }
+    </ComponentErrorBoundary>
+  );
 };
 
 export default function ComponentShowcase() {
@@ -303,11 +411,13 @@ export default function ComponentShowcase() {
 
                 {/* Component preview */}
                 <div className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
-                  <div className="bg-gray-50 rounded-lg p-4 min-h-[120px] flex items-center justify-center">
-                    <ComponentWrapper 
-                      Component={component.Component} 
-                      name={component.name}
-                    />
+                  <div className="bg-gray-50 rounded-lg p-4 min-h-[120px] flex items-center justify-center overflow-hidden">
+                    <div className="w-full h-full max-w-full max-h-[200px] overflow-auto">
+                      <ComponentWrapper 
+                        Component={component.Component} 
+                        name={component.name}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
