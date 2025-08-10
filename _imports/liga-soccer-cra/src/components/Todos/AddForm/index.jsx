@@ -10,7 +10,7 @@ import Collapse from '@mui/material/Collapse';
 
 // utils
 import {useDispatch} from 'react-redux';
-import {addTodo, toggleCollapse} from '@store/../../../features/todos';
+import {addTodo, toggleCollapse} from '@features/todos/todosSlice';
 import {tasksOptions} from '@constants/options';
 import {useState} from 'react';
 import {nanoid} from 'nanoid';
