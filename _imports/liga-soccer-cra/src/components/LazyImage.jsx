@@ -10,15 +10,12 @@ import PropTypes from 'prop-types';
 
 const LazyImage = ({src, alt, effect = 'blur', className, ...props}) => {
     return (
-        <LazyLoadImage
-            src={src}
-            alt={alt}
-            effect={effect}
-            wrapperClassName={`lazy-image ${className || ''}`}
-            {...props}
-        />
+        <span className={`lazy-image ${className || ''}`}>
+            <img src={src} alt={alt} loading="lazy" {...props} />
+        </span>
     );
 }
+
 
 LazyImage.propTypes = {
     src: PropTypes.string.isRequired,
