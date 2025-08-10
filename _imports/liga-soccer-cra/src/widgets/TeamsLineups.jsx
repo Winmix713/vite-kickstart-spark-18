@@ -2,9 +2,7 @@
 import Spring from '@components/Spring';
 import TabButton from '@ui/TabButton';
 import Lineups from '@components/Lineups';
-import {TabsList} from '@mui/base/TabsList';
-import {TabPanel} from '@mui/base/TabPanel';
-import {Tabs} from '@mui/base/Tabs';
+import { TabsList, TabPanel, Tabs } from '@components/TabsBase';
 import Fade from '@mui/material/Fade';
 
 // hooks
