@@ -2,7 +2,7 @@
 import {Form, BtnWrapper, InputWrapper} from './style';
 
 // components
-import CustomSelect from '@ui/Select';
+import CustomSelect from '@ui/CustomSelect';
 import Field from '@ui/Field';
 import Btn from '@ui/Btn';
 import Grow from '@mui/material/Grow';
