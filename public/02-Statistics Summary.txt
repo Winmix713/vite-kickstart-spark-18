@@ -1,0 +1,522 @@
+Statistics Summary
+A quick overview of all statistics available through the Soccer v4 API.
+
+Click the arrow under each table to view endpoints that could return the statistics above.
+
+Category & Sport
+Category Country Code
+Category Id
+
+Category Name
+Sport Id
+
+Sport Name
+
+Category & Sport Info available in:
+
+Competition
+Competition Gender
+Competition Id
+Competition Name
+Competition Parent Id
+Competition Properties - Brackets
+Competition Prop. - Missing Players
+Comp. Prop. - Player Transfer History
+Competition Prop. - Schedules
+Comp. Prop. - Season Player Statistics
+Comp. Prop. - Season Probabilities
+Comp. Prop. - Season Stats Leaders
+Comp. Prop. - Season Team Statistics
+Competition Prop. - Standings
+Comp. Prop. - Team Squads
+Cup Round Id
+Cup Round Name
+Cup Round Order
+Cup Round State
+
+Cup Round Type
+Cup Round Winner Id
+Group – Group Name
+Group Id
+Group Live
+Group Max Rounds
+Group Name
+Group Order
+Group Parent Group Id
+Info Competition Status
+Info Venue Changed
+Info Venue Reduced Capacity
+Info Venue Reduced Capacity Max
+Round Competition Sport Event Number
+Round Cup Round Id
+Round Cup Round # of Sport Events
+Round Cup Round Sport Event Number
+
+Round Name
+Round Number
+Round Other Sport Event Id
+Season Competition Id
+Season Disabled
+Season End Date
+Season Id
+Season Name
+Season Start Date
+Season Year
+Stage End Date
+Stage Order
+Stage Phase
+Stage Start Date
+Stage Type
+Stage Year
+
+Competition Info available in:
+.
+
+
+Competitor
+Competitor Abbreviation
+Competitor Age Group
+Competitor Country
+Competitor Country Code
+Competitor Form
+Competitor Gender
+Competitor Id
+Competitor Name
+Competitor Other Season Id
+Competitor Qualifier
+Competitor Short Name
+Competitor Virtual
+
+Jersey – Base Color
+Jersey – Horizontal Stripes
+Jersey – Horizontal Stripes Color
+Jersey – Number Color
+Jersey – Shirt Type
+Jersey – Sleeve Color
+Jersey – Sleeve Detail
+Jersey – Split
+Jersey – Split Color
+Jersey – Squares
+Jersey – Squares Color
+
+Jersey – Stripes
+Jersey – Stripes Color
+Jersey – Type
+Manager – Country Code
+Manager – Date of Birth
+Manager – Gender
+Manager – Id
+Manager – Name
+Manager – Nationality
+Manager – Nickname
+Manager – Preferred Foot
+
+Competitor Info available in:
+
+Player
+Player Country Code
+Player Date of Birth
+Player Display First Name
+Player Display Last Name
+Player First Name
+Player Gender
+Player Height (cm)
+Player Id
+Player Jersey Number
+Player Last Name
+Player Missing Reason
+
+Player Missing Start Date
+Player Multiple Competitors
+Player Name
+Player Nationality
+Player Nickname
+Player Order
+Player Place of Birth
+Player Played
+Player Preferred Foot
+Player Starter
+Player Status
+
+Player Transfer Date
+Player Transfer From Competitor
+Player Transfer Role Type
+Player Transfer To Competitor
+Player Type (position)
+Player Weight (kg)
+Team Membership – Active Flag
+Team Membership – End Date
+Team Membership – Jersey Number
+Team Membership – Start Date
+Team Membership – Type
+
+Player Info available in:
+
+Mapping
+External Id
+Id
+
+Merged Id
+Name
+
+Retained Id
+
+Mapping Info available in:
+
+Venue
+Capacity
+Changed
+City
+Country
+
+Country Code
+Id
+Map Coordinates
+Name
+
+Reduced Capacity
+Reduced Capacity Max
+Timezone
+
+Venue Info available in:
+
+Sport Events
+Attendance Count
+Channel Country
+Channel Country Code
+Channel Name
+Channel URL
+Coverage Type
+Ground Neutral
+Group Properties - Brackets
+Group Properties - Cup
+Group Properties – Group Stage
+Group Properties - League
+Group Properties - Missing Players
+Group Properties - Qualification
+Group Properties - Results
+Group Properties - Schedules
+Group Properties - Standings
+Lineups Confirmed
+Match Facts
+Referee Id
+
+Referee Name
+Referee Nationality
+Referee Country Code
+Referee Type
+Sport Event Created Id
+Sport Event Created At
+Sport Event Created - Active Season
+Sport Event Id
+Sport Event Order
+Sport Event Removed Id
+Sport Event Replaced By
+Sport Event Resume Time
+Sport Event Start Time
+Sport Event Start Time Confirmed
+Sport Event Properties - Assists
+Sport Event Properties - Ballspotting
+Sport Event Prop. - Basic Play-by-Play
+Sport Event Prop. - Basic Player Stats
+Sport Event Prop. - Basic Team Stats
+Sport Event Prop. - Commentary
+
+Sport Event Prop. - Deeper Play by Play
+Sport Event Prop. - Deeper Player Stats
+Sport Event Prop. - Deeper Team Stats
+Sport Event Prop. – Ext. Play-by-Play
+Sport Event Prop. – Ext. Player Stats
+Sport Event Prop. – Ext. Team Stats
+Sport Event Prop. - Formations
+Sport Event Prop. - Fun Facts
+Sport Event Prop. - Game Clock
+Sport Event Prop. - Goal Scorers
+Sport Event Prop. - Goal Scorers Live
+Sport Event Properties – Lineups
+Sport Event Properties – Lineups Avail.
+Sport Event Properties – Probabilities
+Sport Event Properties – Scores
+Sport Event Properties – Venue
+Sport Event Upcoming - Id
+Sport Event Updated - Id
+Sport Event Updated - Updated At
+Weather - Overall Conditions
+Weather - Pitch Conditions
+
+Sport Event Info available in:
+
+Match Lineups
+Player Order	Player Position	Team Formation
+Match Lineups Info available in:
+
+Match Probabilities
+Away Team Win Probability
+Draw Probability
+Home Team Win Probability
+Market Away Score
+
+Market Home Score
+Market Last Updated
+Market Live
+Market Name
+
+Market Removed
+Match Time
+Outcome Name
+
+Match Probabilities Info available in:
+
+Boxscore
+Clock Played
+Clock Stoppage Time Announced
+Clock Stoppage Time Played
+Match Situation – Qualifier
+Match Situation - Status
+Match Situation – Updated At
+Period Score Away Score
+Period Score Home Score
+Period Score Number
+
+Period Score Type
+Sport Event Stat – Agg Away Score
+Sport Event Status – Aggregate Home Score
+Sport Event Status – Aggregate Winner Id
+Sport Event Status – Away Normaltime Score
+Sport Event Status – Away Overtime Score
+Sport Event Status – Away Score
+Sport Event Status – Decided by Fed
+Sport Event Status – Home Normaltime Score
+
+Sport Event Status – Home Overtime Score
+Sport Event Status – Home Score
+Sport Event Status – Match Status
+Sport Event Status – Match Tie
+Sport Status – Scout Abandoned
+Sport Event Status – Status
+Sport Event Status – Winner Id
+
+Boxscore Info available in:
+
+Match Timeline
+Away Team Score
+Ball Location – Qualifier
+Ball Location – Order
+Ball Location – X Coordinate
+Ball Location – Y Coordinate
+Event Break Name
+Event Card Description
+Event Commentary
+Event Competitor
+Event Coordinate X
+Event Coordinate Y
+Event Description
+
+Event Id
+Event Injury Time Announced
+Event Match Clock
+Event Match Time
+Event Method
+Event Outcome
+Event Period Name
+Event Period Type
+Event Shootout Away Score
+Event Shootout Home Score
+Event Status
+
+Event Stoppage Time
+Event Stoppage Time Clock
+Event Type
+Event Time
+Event Updated
+Event Updated Time
+Home Team Score
+Sport Event Timeline Id
+Sport Event Timeline Start Time
+Sport Event Timeline Delta Id
+Sport Event Timeline Delta Start Time
+
+Match Timeline Info available in:
+
+Match Timeline - Play Details
+Assisting Player Id
+Assisting Player Name
+Assisting Player Type
+Goal Scorer Id
+
+Goal Scorer – Name
+Goal Scorer – Type
+Substitution Player In – Id
+Substitution Player In – Name
+
+Substitution Player In – Type
+Substitution Player Out – Id
+Substitution Player Out – Name
+Substitution Player Out – Type
+
+Play Details available in:
+
+Match Statistics - Team
+Assists
+Ball Possession
+Cards Given
+Corner Kicks
+Fouls
+Free Kicks
+Goal Kicks
+
+Goals
+Injuries
+Offsides
+Penalties Missed
+Red Cards
+Shots Blocked
+Shots off Target
+
+Shots on Target
+Shots Saved
+Shots Total
+Substitutions
+Throw-ins
+Yellow Cards
+Yellow Red Cards
+
+Match Stats (Team) available in:
+
+Match Statistics - Player
+Assists
+Corner Kicks
+Goals Scored
+Offsides
+Own Goals
+
+Penalties Missed
+Red Cards
+Shots Blocked
+Shots off Target
+Shots on Target
+
+Substituted In
+Substituted Out
+Yellow Cards
+Yellow/Red Cards
+
+Match Stats (Player) available in:
+
+Seasonal Statistics - Team
+Average Ball Possession
+Cards Given
+Corner Kicks
+Free Kicks
+Goals by Foot
+Goals by Head
+Goals Conceded
+Goals Conceded First Half
+Goals Conceded Second Half
+Goals Scored
+
+Goals Scored First Half
+Goals Scored Second Half
+Matches Played
+Offsides
+Over/Under List Type
+Over/Under – Goals
+Over/Under – Matches Over
+Over/Under – Matches Under
+Penalties Missed
+
+Red Cards
+Shots Blocked
+Shots off Target
+Shots on Bar
+Shots on Post
+Shots on Target
+Shots Total
+Yellow Cards
+Yellow/Red Cards
+
+Season Stats (Team) available in:
+
+Seasonal Statistics - Player
+Assists
+Cards Given
+Corner Kicks
+Goals by Head
+Goals by Penalty
+Goals Conceded
+Goals Scored
+
+Matches Played
+Offsides
+Own Goals
+Penalties Missed
+Red Cards
+Shots Blocked
+
+Shots off Target
+Shots on Target
+Substituted In
+Substituted Out
+Yellow Cards
+Yellow/Red Cards
+
+Season Stats (Player) available in:
+
+Season Leaders
+Datapoint Type
+Datapoint Value
+
+Leader Rank
+
+List Type
+
+Season Leaders Info available in:
+
+Standings
+Change
+Current Outcome
+Draws
+Form Standings Results
+Form Standings Type
+Goals Against
+Goals Differential
+Goals For
+Group – Group Name
+
+Group Comment Text
+Group Id
+Group Live
+Group Name
+Losses
+Matches Played
+Points
+Points Draw
+
+Points Loss
+Points Per Game
+Points Win
+Rank
+Round
+Tie Break Rule
+Type
+Wins
+
+Season Standings Info available in:
+
+Metadata
+Channel
+Competition Id
+Event Id
+Format
+
+Heartbeat (from)
+Heartbeat (to)
+Heartbeat Interval
+Heartbeat Package
+
+Heartbeat Type
+Season Id
+Sport Id
+Sport Event Id
+
+Metadata Info available in:

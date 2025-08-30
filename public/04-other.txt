@@ -1,0 +1,33 @@
+https://developer.sportradar.com/soccer/reference/soccer-push-statistics
+további developer tartalom:
+
+
+"Push Feeds
+
+Push Events
+Push Statistics
+Probabilities Feeds
+
+Live Probabilities
+Season Outright Probabilities
+Sport Event Probabilities
+Sport Event Upcoming Probabilities
+Timeline Probabilities
+Change Log
+FAQs
+Soccer Extended
+Extended Overview
+OpenAPI Spec
+Extended Statistics Summary
+Endpoints
+
+Push Feeds
+
+Probabilities Endpoints
+
+Extended Change Log
+Extended FAQs
+
+"
+-------------------------
+Befejezésként ,még annyit ,hogy célzottan keresnünk kell , azokat a mérkőzéseket , amelynél a mindkét csapat szerez gólt, és a 2.5 gólnál több, (tehát megcélzunk egy csoportot és arra hangoljuk a predikciós rendszert) 

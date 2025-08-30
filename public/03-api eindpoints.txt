@@ -1,0 +1,45 @@
+api eindpoints:
+
+
+"Competition Seasons
+Competitions
+Competitor Profile
+Competitor Schedules
+Competitor Summaries
+Competitor vs Competitor
+Daily Schedules
+Daily Summaries
+League Timeline
+Live Schedules
+Live Summaries
+Live Timelines
+Live Timelines Delta
+Mapping Feeds
+
+Player Profile
+Player Schedules
+Player Summaries
+Season Competitors
+Season Form Standings
+Season Info
+Season Leaders
+Season Lineups
+Season Links
+Season Missing Players
+Season Over/Under Statistics
+Season Players
+Season Probabilities
+Season Schedule
+Season Standings
+Season Summaries
+Season Transfers
+Seasonal Competitor Players
+Seasonal Competitor Statistics
+Seasons
+Sport Event Fun Facts
+Sport Event Lineups
+Sport Event Summary
+Sport Event Timeline
+Sport Events Created
+Sport Events Removed
+Sport Events Updated"
