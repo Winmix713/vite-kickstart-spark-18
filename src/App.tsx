@@ -1,3 +1,5 @@
+console.log("App.tsx: Starting imports...");
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,9 +14,15 @@ import Editor from "./pages/Editor";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
+console.log("App.tsx: All imports successful");
+
 const queryClient = new QueryClient();
 
-const App = () => (
+console.log("App.tsx: QueryClient created");
+
+const App = () => {
+  console.log("App.tsx: Rendering App component");
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -35,6 +43,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
