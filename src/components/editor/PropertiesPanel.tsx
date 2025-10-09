@@ -13,15 +13,7 @@ import { useEditor } from "@/contexts/EditorContext";
 import { PropertyGroup } from "./PropertyGroup";
 import { PROPERTY_GROUPS, getRelevantGroups, getGroupValues } from "./propertyGroupsConfig";
 
-const styleSchema = z.object({
-  // Dinamikusan generált schema az összes property-ből
-  ...Object.values(PROPERTY_GROUPS).reduce((acc, group) => {
-    group.properties.forEach((prop) => {
-      acc[prop.key] = z.string().optional();
-    });
-    return acc;
-  }, {} as Record<string, z.ZodOptional<z.ZodString>>),
-});
+const styleSchema = z.record(z.string(), z.string().optional());
 
 type StyleFormData = z.infer<typeof styleSchema>;
 
@@ -56,7 +48,7 @@ export const PropertiesPanel = () => {
 
   // Stílus változtatás kezelése
   const handleStyleChange = (property: string, value: string) => {
-    setValue(property as keyof StyleFormData, value);
+    setValue(property as keyof StyleFormData, value as any);
     
     if (!selectedElement) return;
 
