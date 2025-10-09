@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 220 25% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 20% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 195 100% 60%;
+    --primary-foreground: 220 25% 8%;
+
+    --secondary: 280 100% 70%;
+    --secondary-foreground: 220 25% 8%;
+
+    --muted: 220 15% 20%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 150 100% 60%;
+    --accent-foreground: 220 25% 8%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 15% 18%;
+    --input: 220 15% 15%;
+    --ring: 195 100% 60%;
+
+    --radius: 1rem;
+
+    --glass-bg: 220 20% 12% / 0.6;
+    --glass-border: 210 40% 98% / 0.1;
+    --gradient-primary: linear-gradient(135deg, hsl(195 100% 60%), hsl(280 100% 70%));
+    --gradient-accent: linear-gradient(135deg, hsl(280 100% 70%), hsl(150 100% 60%));
+    --shadow-glow: 0 0 30px hsl(195 100% 60% / 0.3);
+    --shadow-card: 0 8px 32px hsl(220 25% 4% / 0.4);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image: 
+      radial-gradient(at 0% 0%, hsl(195 100% 60% / 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsl(280 100% 70% / 0.1) 0px, transparent 50%);
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-xl border border-white/10;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  }
+  
+  .hover-glow {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-glow:hover {
+    box-shadow: var(--shadow-glow);
+  }
+}
