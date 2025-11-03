@@ -180,7 +180,7 @@ export const Phase9Dashboard: React.FC<Phase9DashboardProps> = ({ matchId }) => 
                 <HealthMetric
                   title="Feature Experiments"
                   value="12"
-                  status="active"
+                  status="excellent"
                   description="Running experiments"
                 />
               </div>

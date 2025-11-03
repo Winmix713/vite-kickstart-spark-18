@@ -101,7 +101,7 @@ export const matchHistory: Record<string, MatchResult[]> = {
 };
 
 // Generate realistic match history for teams without explicit data
-export const generateMatchHistory = (teamName: string, overallRating: number): MatchResult[] => {
+export const generateMatchHistory = (_teamName: string, overallRating: number): MatchResult[] => {
   const opponents = [
     "Team A", "Team B", "Team C", "Team D", "Team E",
     "Team F", "Team G", "Team H", "Team I", "Team J"

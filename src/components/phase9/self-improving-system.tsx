@@ -11,10 +11,8 @@ import {
   Brain, 
   Rocket, 
   TestTube, 
-  TrendingUp, 
-  Settings,
+  TrendingUp,
   Play,
-  Pause,
   CheckCircle,
   XCircle,
   Clock,
@@ -27,8 +25,7 @@ import { SelfImprovingSystemService } from '@/lib/phase9-api';
 import type { 
   FeatureExperiment, 
   ExperimentDashboardProps,
-  FeatureGenerationRequest,
-  ContinuousLearningResponse
+  FeatureGenerationRequest
 } from '@/types/phase9';
 
 // Experiment Dashboard Component
@@ -461,8 +458,8 @@ const ExperimentList: React.FC<ExperimentListProps> = ({
               </div>
               <div>
                 <span className="text-gray-600">Improvement:</span>
-                <div className={`font-semibold ${experiment.improvement_delta > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {experiment.improvement_delta > 0 ? '+' : ''}{experiment.improvement_delta?.toFixed(2)}%
+                <div className={`font-semibold ${(experiment.improvement_delta ?? 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {(experiment.improvement_delta ?? 0) > 0 ? '+' : ''}{experiment.improvement_delta?.toFixed(2)}%
                 </div>
               </div>
               <div>

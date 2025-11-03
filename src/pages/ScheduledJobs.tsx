@@ -35,9 +35,9 @@ export default function ScheduledJobs() {
   const [toggleJobId, setToggleJobId] = useState<string | null>(null);
   const [runJobId, setRunJobId] = useState<string | null>(null);
 
-  const jobsQuery = useQuery<JobSummary[]>({
+  const jobsQuery = useQuery({
     queryKey: ["scheduled-jobs"],
-    queryFn: fetchJobs,
+    queryFn: async (): Promise<JobSummary[]> => fetchJobs(),
     refetchInterval: 30000,
     refetchIntervalInBackground: false,
   });
@@ -55,19 +55,15 @@ export default function ScheduledJobs() {
     return data?.logs ?? [];
   };
 
-  const logsQuery = useQuery<JobLog[]>({
+  const logsQuery = useQuery({
     queryKey: ["job-logs", selectedJob?.id],
-    queryFn: fetchLogs,
+    queryFn: async (): Promise<JobLog[]> => fetchLogs(),
     enabled: logsOpen && Boolean(selectedJob),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const message = err instanceof Error ? err.message : "Nem sikerült betölteni a naplókat";
-      toast.error(message);
-    },
   });
 
-  const toggleMutation = useMutation<JobSummary | undefined, Error, { jobId: string; enabled: boolean }>({
-    mutationFn: async ({ jobId, enabled }) => {
+  const toggleMutation = useMutation({
+    mutationFn: async ({ jobId, enabled }: { jobId: string; enabled: boolean }): Promise<JobSummary | undefined> => {
       const { data, error } = await supabase
         .functions
         .invoke<JobToggleResponse>("jobs-toggle", { body: { jobId, enabled } });
@@ -93,8 +89,8 @@ export default function ScheduledJobs() {
     },
   });
 
-  const runMutation = useMutation<JobTriggerResponse["result"], Error, { jobId: string; force?: boolean }>({
-    mutationFn: async ({ jobId, force }) => {
+  const runMutation = useMutation({
+    mutationFn: async ({ jobId, force }: { jobId: string; force?: boolean }): Promise<JobTriggerResponse["result"]> => {
       const { data, error } = await supabase
         .functions
         .invoke<JobTriggerResponse>("jobs-trigger", { body: { jobId, force } });
@@ -210,7 +206,7 @@ export default function ScheduledJobs() {
         open={logsOpen}
         onOpenChange={handleCloseLogs}
         job={selectedJob}
-        logs={logsQuery.data ?? []}
+        logs={logsQuery.data || []}
         isLoading={logsQuery.isLoading}
         onRefresh={() => void logsQuery.refetch()}
       />

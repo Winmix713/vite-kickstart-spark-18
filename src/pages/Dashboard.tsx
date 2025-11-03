@@ -90,8 +90,8 @@ export default function Dashboard() {
 
       if (allPredictionsError) throw allPredictionsError;
 
-      const evaluatedPredictions = allPredictions?.filter((p) => p.was_correct !== null) || [];
-      const correctPredictions = evaluatedPredictions.filter((p) => p.was_correct).length;
+      const evaluatedPredictions = allPredictions?.filter((p: { was_correct: boolean | null }) => p.was_correct !== null) || [];
+      const correctPredictions = evaluatedPredictions.filter((p: { was_correct: boolean | null }) => p.was_correct).length;
       const totalEvaluated = evaluatedPredictions.length;
       const accuracy = totalEvaluated > 0 ? Math.round((correctPredictions / totalEvaluated) * 100) : 0;
 

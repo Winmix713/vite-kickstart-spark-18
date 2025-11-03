@@ -26,7 +26,7 @@ export async function listModels(): Promise<ModelRegistry[]> {
 
   if (error) throw new ModelServiceError(error.message);
 
-  return (data ?? []).map((m) => ({
+  return (data ?? []).map((m: { model_type: string; hyperparameters: string | null }) => ({
     ...m,
     model_type: (m.model_type as ModelRegistry["model_type"]) ?? "challenger",
     hyperparameters: parseJSON<Record<string, unknown>>(m.hyperparameters) ?? null,
@@ -40,7 +40,7 @@ export async function registerModel(input: Omit<ModelRegistry, "id" | "registere
     if (champions && champions.length > 0) {
       await supabase.from("model_registry").update({ model_type: "retired", traffic_allocation: 0 }).in(
         "id",
-        champions.map((c) => c.id),
+        champions.map((c: { id: string }) => c.id),
       );
     }
   }
@@ -185,8 +185,8 @@ export async function evaluateExperiment(experimentId: string): Promise<ModelExp
 
   const n1 = championData.length;
   const n2 = challengerData.length;
-  const x1 = championData.filter((r) => r.was_correct === true).length; // successes
-  const x2 = challengerData.filter((r) => r.was_correct === true).length;
+  const x1 = championData.filter((r: { was_correct: boolean }) => r.was_correct === true).length; // successes
+  const x2 = challengerData.filter((r: { was_correct: boolean }) => r.was_correct === true).length;
 
   const p1 = n1 > 0 ? x1 / n1 : 0;
   const p2 = n2 > 0 ? x2 / n2 : 0;

@@ -151,7 +151,7 @@ const MatchSelection = () => {
         throw new Error("Nem sikerült lekérni a csapatokat a Supabase-ből");
       }
 
-      const teamMap = new Map(allTeams.map((team) => [team.name, team.id]));
+      const teamMap = new Map(allTeams.map((team: { name: string; id: string }) => [team.name, team.id]));
 
       const predictionPromises = completedMatches.map(async (match) => {
         const homeTeamId = teamMap.get(match.home.value);
@@ -188,7 +188,7 @@ const MatchSelection = () => {
           return null;
         }
 
-        const normalizedPatterns: NormalizedPattern[] = (predictionData?.patterns ?? []).map((pattern: RawPatternResponse, idx) => ({
+        const normalizedPatterns: NormalizedPattern[] = (predictionData?.patterns ?? []).map((pattern: RawPatternResponse, idx: number) => ({
           key: pattern.template_name ?? `pattern-${idx}`,
           name: formatPatternName(pattern.template_name),
           confidence_boost: pattern.confidence_boost ?? 0,

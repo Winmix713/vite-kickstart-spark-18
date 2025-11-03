@@ -1,5 +1,4 @@
 import { ChevronRight, Radar, Wifi, Sparkles, Activity, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import ControlPanel from "./ControlPanel";
 import stadiumImage from "@/assets/stadium-champions-league.jpg";
 import manCityLogo from "@/assets/team-logo-mancity.png";

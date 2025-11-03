@@ -853,7 +853,7 @@ export class SelfImprovingSystemService {
   static async testFeature(experimentId: string): Promise<{ success: boolean; result?: any; error?: string }> {
     try {
       // Get experiment details
-      const { data: experiment, error: fetchError } = await supabase
+      const { data: _experiment, error: fetchError } = await supabase
         .from("feature_experiments")
         .select("*")
         .eq("id", experimentId)
@@ -1058,7 +1058,7 @@ export class SelfImprovingSystemService {
       if (error) throw error
 
       const totalImprovement =
-        approvedFeatures?.reduce((sum, feature) => sum + (feature.improvement_delta || 0), 0) || 0
+        approvedFeatures?.reduce((sum: number, feature: { improvement_delta: number | null }) => sum + (feature.improvement_delta || 0), 0) || 0
 
       return {
         success: true,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { supabase } from "@/integrations/supabase/client";

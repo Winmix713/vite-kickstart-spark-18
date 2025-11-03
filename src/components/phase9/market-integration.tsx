@@ -7,8 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Loader2, 
-  TrendingUp, 
+  Loader2,
   DollarSign, 
   RefreshCw, 
   AlertCircle,
@@ -22,8 +21,7 @@ import type {
   MarketOdds, 
   ValueBet, 
   MarketOddsDisplayProps, 
-  ValueBetHighlightsProps,
-  ExpectedValueCalculation
+  ValueBetHighlightsProps
 } from '@/types/phase9';
 
 // Market Odds Display Component

@@ -218,7 +218,7 @@ export default function ModelsPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie dataKey="value" data={trafficData} outerRadius={90} label>
-                          {trafficData.map((entry, index) => (
+                          {trafficData.map((_entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>

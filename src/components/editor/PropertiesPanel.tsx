@@ -67,12 +67,14 @@ export const PropertiesPanel = () => {
 
   // Stílusok másolása
   const handleCopyStyles = () => {
-    const stylesToCopy = Object.entries(values)
-      .filter(([_, value]) => value && value !== "")
-      .reduce((acc, [key, value]) => {
+  const stylesToCopy = Object.entries(values)
+    .filter(([_, value]) => value && value !== "")
+    .reduce((acc, [key, value]) => {
+      if (value) {
         acc[key] = value;
-        return acc;
-      }, {} as Record<string, string>);
+      }
+      return acc;
+    }, {} as Record<string, string>);
 
     navigator.clipboard.writeText(JSON.stringify(stylesToCopy, null, 2));
   };

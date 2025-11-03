@@ -30,7 +30,7 @@ export function ComputationMapDashboard({ graph }: Props) {
       </CardHeader>
       <CardContent style={{ height: 420 }}>
         <ReactFlow nodes={nodes} edges={edges} fitView>
-          <MiniMap pannable zoomable />
+          <MiniMap />
           <Controls />
           <Background gap={16} size={1} />
         </ReactFlow>

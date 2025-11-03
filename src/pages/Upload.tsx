@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 
 export default function Upload() {
   const { user } = useAuth();

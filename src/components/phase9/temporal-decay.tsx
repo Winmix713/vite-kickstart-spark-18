@@ -19,8 +19,7 @@ import { toast } from '@/hooks/use-toast';
 import { TemporalDecayService } from '@/lib/phase9-api';
 import type { 
   InformationFreshness, 
-  FreshnessIndicatorProps,
-  TemporalDecayConfig 
+  FreshnessIndicatorProps
 } from '@/types/phase9';
 
 // Freshness Indicator Component

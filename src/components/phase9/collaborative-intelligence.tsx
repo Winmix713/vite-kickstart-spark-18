@@ -16,7 +16,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, TrendingUp, Users, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { CollaborativeIntelligenceService } from '@/lib/phase9-api';
-import type { UserPredictionForm, UserPredictionFormProps } from '@/types/phase9';
+import type { 
+  UserPredictionForm as UserPredictionFormData,
+  UserPredictionFormProps 
+} from '@/types/phase9';
 
 // Form validation schema
 const predictionSchema = z.object({
@@ -44,7 +47,7 @@ export const UserPredictionForm: React.FC<UserPredictionFormProps> = ({
     setValue,
     watch,
     formState: { errors, isValid }
-  } = useForm<UserPredictionForm>({
+  } = useForm<UserPredictionFormData>({
     resolver: zodResolver(predictionSchema),
     defaultValues: {
       predicted_outcome: 'home_win',
@@ -57,7 +60,7 @@ export const UserPredictionForm: React.FC<UserPredictionFormProps> = ({
   const confidenceScore = watch('confidence_score');
   const predictedOutcome = watch('predicted_outcome');
 
-  const handleFormSubmit = async (data: UserPredictionForm) => {
+  const handleFormSubmit = async (data: UserPredictionFormData) => {
     setIsSubmitting(true);
     
     try {

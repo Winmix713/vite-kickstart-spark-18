@@ -16,9 +16,9 @@ import { RefreshCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const useHealth = () =>
-  useQuery<HealthSummaryResponse>({
+  useQuery({
     queryKey: ["monitoring", "health"],
-    queryFn: async () => {
+    queryFn: async (): Promise<HealthSummaryResponse> => {
       const { data, error } = await supabase.functions.invoke<HealthSummaryResponse>("monitoring-health");
       if (error) throw new Error(error.message);
       return data as HealthSummaryResponse;
@@ -27,9 +27,9 @@ const useHealth = () =>
   });
 
 const useGraph = () =>
-  useQuery<ComputationGraphResponse>({
+  useQuery({
     queryKey: ["monitoring", "graph"],
-    queryFn: async () => {
+    queryFn: async (): Promise<ComputationGraphResponse> => {
       const { data, error } = await supabase.functions.invoke<ComputationGraphResponse>("monitoring-computation-graph");
       if (error) throw new Error(error.message);
       return data as ComputationGraphResponse;
@@ -38,9 +38,9 @@ const useGraph = () =>
   });
 
 const useAlerts = () =>
-  useQuery<AlertsResponse>({
+  useQuery({
     queryKey: ["monitoring", "alerts"],
-    queryFn: async () => {
+    queryFn: async (): Promise<AlertsResponse> => {
       const { data, error } = await supabase.functions.invoke<AlertsResponse>("monitoring-alerts");
       if (error) throw new Error(error.message);
       return data as AlertsResponse;
@@ -49,9 +49,9 @@ const useAlerts = () =>
   });
 
 const useMetrics = (component?: string | null) =>
-  useQuery<MetricsResponse>({
+  useQuery({
     queryKey: ["monitoring", "metrics", component ?? "all"],
-    queryFn: async () => {
+    queryFn: async (): Promise<MetricsResponse> => {
       const { data, error } = await supabase.functions.invoke<MetricsResponse>("monitoring-metrics", {
         body: component ? { component } : {},
       });
