@@ -1,73 +1,134 @@
-# Welcome to your Lovable project
+# WinMix TipsterHub – Integrated Intelligence Platform (Phases 3–9)
 
-## Project info
+WinMix TipsterHub is an end-to-end football analytics and prediction platform that now consolidates every capability delivered across phases 3 through 9 into a single cohesive system. The application blends automated data ingestion, model evaluation, cross-league intelligence, monitoring, and self-improving market collaboration features on top of a modern React + Supabase stack.
 
-**URL**: https://lovable.dev/projects/a3ec52bf-b2dd-4c75-b948-60b98b2c08b9
+---
 
-## How can I edit this code?
+## 🏗️ Platform Architecture
 
-There are several ways of editing your application.
+| Layer | Technologies | Responsibilities |
+| --- | --- | --- |
+| **Frontend** | React (Vite), TypeScript, Tailwind, shadcn-ui, TanStack Query, React Router | SPA experience with feature-specific dashboards (jobs, analytics, models, cross-league, monitoring, phase 9). Manages routing, state, visualizations, real-time feedback, and user interactions. |
+| **Integrations** | Supabase SDK, Supabase Edge Functions | Secure data operations (auth, tables) and custom Edge Functions for jobs, analytics, and phase 9 services. Edge Functions expose REST-like endpoints that the client consumes via the `supabase.functions.invoke` calls. |
+| **Domain Logic** | `/src/integrations`, `/src/lib`, `/src/types` | Encapsulates domain-specific contracts (job definitions, model metrics, monitoring KPIs, phase 9 intelligence) and shared utilities that standardize payloads across features. |
+| **Analytics & Automation** | Supabase tables, background jobs | Phase 3 cron scheduling, Phase 4 feedback loop aggregation, Champion/Challenger orchestration, temporal decay, and collaborative market learning pipelines. |
 
-**Use Lovable**
+Key data flow:
+1. **Scheduled Jobs (Phase 3)** wake via Supabase Edge Functions and emit job state/log updates that the frontend consumes via TanStack Query.
+2. **Feedback Loop (Phase 4)** pushes prediction outcomes back into Supabase tables, feeding analytics, model comparisons, and dashboards.
+3. **Champion / Challenger Framework (Phase 6)** monitors model families, triggering promotions, demotions, and retraining requests.
+4. **Cross-League Intelligence (Phase 7)** unifies league feeds to produce correlation heatmaps, radar differentials, and strategic insights.
+5. **Monitoring & Visualization (Phase 8)** exposes system health, data freshness, compute loads, and anomaly detection dashboards.
+6. **Collaborative Market Intelligence (Phase 9)** layers temporal decay weighting, self-improvement loops, and market blending to enhance predictive precision.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a3ec52bf-b2dd-4c75-b948-60b98b2c08b9) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Feature Overview by Phase
 
-**Use your preferred IDE**
+### Phase 3 – Scheduled Jobs & Automation
+- Jobs list, status controls, manual triggers, log viewers (`/jobs`).
+- Supabase Edge Functions: `jobs-list`, `jobs-logs`, `jobs-toggle`, `jobs-trigger`.
+- UI components: `JobStatusCard`, `JobLogsDialog`, adaptive skeleton loaders.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Phase 4 – Feedback Loop & Model Evaluation
+- Analytics workspace (`/analytics`) with model performance charts, feedback forms, and post-match evaluation flows.
+- Integrations for performance snapshots, calibration metrics, automated retraining flags.
+- Supabase-driven feedback loop that closes the model refinement process.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Phase 6 – Champion / Challenger Framework
+- Model management hub (`/models`) for champion/challenger insights, promotions, audit history, and feature experiments.
+- Domain types under `src/types/models.ts` and service helpers in `src/integrations/models/service.ts`.
 
-Follow these steps:
+### Phase 7 – Cross-League Intelligence
+- Cross-league dashboard (`/crossleague`) with correlation heatmaps, league comparison radar charts, and meta-pattern surfacing.
+- Smart refetching, league filters, and storyline highlights for analysts.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Phase 8 – Monitoring & Visualization
+- Real-time monitoring center (`/monitoring`) showing compute loads, system health cards, anomaly watchlists, and SLA tracking.
+- Visual components under `src/components/monitoring`.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Phase 9 – Advanced Collaborative Market Intelligence
+- Holistic intelligence suite (`/phase9`) combining collaborative analysis, market integration, temporal decay, and self-improving loops.
+- Modular components in `src/components/phase9` and API layer in `src/lib/phase9-api.ts`.
+- Automated tests in `src/test/phase9.test.ts` covering core behaviors.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## 🧭 Navigation & Key Routes
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Landing experience with quick access to prediction workflows. |
+| `/predictions/new` | 8-match wizard for generating fresh predictions. |
+| `/predictions` | Review existing predictions, confidence scores, and feedback actions. |
+| `/dashboard` | Executive summary of KPIs, win rates, and operational status. |
+| `/analytics` | Phase 4 analytics & feedback loop cockpit. |
+| `/jobs` | Phase 3 scheduler control plane. |
+| `/models` | Phase 6 model governance. |
+| `/crossleague` | Phase 7 intelligence dashboard. |
+| `/monitoring` | Phase 8 observability portal. |
+| `/phase9` | Phase 9 collaborative market intelligence hub. |
+| `/teams`, `/matches`, `/leagues` | Core domain exploration views. |
+
+The sidebar (`src/components/Sidebar.tsx`) provides quick access to all major workspaces and reflects the expanded navigation after integration.
+
+---
+
+## 📂 Project Structure Highlights
+
+```
+src/
+  components/         # Feature-specific component suites (jobs, models, monitoring, phase9, etc.)
+  integrations/       # Supabase clients, model services, and domain adapters
+  lib/                # Shared utilities (phase 9 API client, helpers)
+  pages/              # Route-level pages mapped in App.tsx
+  types/              # TypeScript domains for jobs, models, monitoring, phase9
+  hooks/              # Shared hooks (e.g., useRealtimeSubscription)
+supabase/functions/   # Edge Functions powering jobs and analytics orchestration
 ```
 
-**Edit a file directly in GitHub**
+Supplementary documentation:
+- `WinMix_TipsterHub_Phase_3-9_Components_EN.md` – deep dive into components per phase.
+- `PHASE9_IMPLEMENTATION.md` – architectural notes on the advanced collaborative intelligence layer.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🛠️ Local Development
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Prerequisites
+- Node.js 18+
+- npm or bun
+- Supabase project (or Supabase CLI) configured with the matching schema & Edge Functions.
 
-## What technologies are used for this project?
+### Setup
+```bash
+npm install
+npm run dev
+```
+- Create a `.env` using the provided example values for Supabase keys.
+- Start the Vite dev server at `http://localhost:5173`.
+- Ensure Supabase Edge Functions (`supabase/functions/*`) are deployed or running via `supabase functions serve` when testing job and analytics features locally.
 
-This project is built with:
+### Testing
+Run targeted tests (e.g., Phase 9 suite):
+```bash
+npm test -- Phase9
+```
+(Full CI will execute linting, type-checks, and all feature tests.)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## 📣 Integration Notes
+- All feature branches (Phases 3 → 9) have been merged sequentially into `integration/merge-phases-3-4-6-7-8-9` with navigation, routes, and domain types normalized to avoid duplication.
+- Shared UI elements (e.g., `Sidebar`, `App.tsx`) have consolidated imports and route registrations to surface every phase feature consistently.
+- Documentation now reflects the unified system so reviewers and stakeholders can evaluate the entire product surface area from a single reference.
 
-Simply open [Lovable](https://lovable.dev/projects/a3ec52bf-b2dd-4c75-b948-60b98b2c08b9) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## 🤝 Contributing
+1. Create feature branches off the integration branch (`integration/merge-phases-3-4-6-7-8-9`).
+2. Follow the established folder conventions (`components/<feature>`, `pages/<Feature>.tsx`).
+3. Use TanStack Query for data synchronization and Supabase Edge Functions for server-side orchestration.
+4. Update documentation when introducing new domain concepts or workflows.
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+By keeping these guidelines in mind, the integrated TipsterHub platform remains maintainable, observable, and ready for further enhancements.
