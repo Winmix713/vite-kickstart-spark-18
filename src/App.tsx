@@ -1,49 +1,57 @@
-console.log("App.tsx: Starting imports...");
+import { Toaster } from "@/components/ui/toaster"
+import { Toaster as Sonner } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import Index from "./pages/Index"
+import NewPredictions from "./pages/NewPredictions"
+import Teams from "./pages/Teams"
+import TeamDetail from "./pages/TeamDetail"
+import Matches from "./pages/Matches"
+import Leagues from "./pages/Leagues"
+import Dashboard from "./pages/Dashboard"
+import MatchDetail from "./pages/MatchDetail"
+import PredictionsView from "./pages/PredictionsView"
+import ScheduledJobs from "./pages/ScheduledJobs"
+import Phase9 from "./pages/Phase9"
+import NotFound from "./pages/NotFound"
+import CrossLeague from "./pages/CrossLeague"
+import Analytics from "./pages/Analytics"
+import Models from "./pages/Models"
+import Monitoring from "./pages/Monitoring"
+import SoccerHub from "./pages/SoccerHub"
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./hooks/useAuth";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Upload from "./pages/Upload";
-import ComponentDetail from "./pages/ComponentDetail";
-import Editor from "./pages/Editor";
-import Profile from "./pages/Profile";
-import NotFound from "./pages/NotFound";
+const queryClient = new QueryClient()
 
-console.log("App.tsx: All imports successful");
-
-const queryClient = new QueryClient();
-
-console.log("App.tsx: QueryClient created");
-
-const App = () => {
-  console.log("App.tsx: Rendering App component");
-  return (
+const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/upload" element={<Upload />} />
-            <Route path="/component/:id" element={<ComponentDetail />} />
-            <Route path="/component/:id/edit" element={<Editor />} />
-            <Route path="/profile/:username" element={<Profile />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/predictions" element={<PredictionsView />} />
+          <Route path="/predictions/new" element={<NewPredictions />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/monitoring" element={<Monitoring />} />
+          <Route path="/models" element={<Models />} />
+          <Route path="/crossleague" element={<CrossLeague />} />
+          <Route path="/match/:id" element={<MatchDetail />} />
+          <Route path="/teams" element={<Teams />} />
+          <Route path="/teams/:teamName" element={<TeamDetail />} />
+          <Route path="/matches" element={<Matches />} />
+          <Route path="/leagues" element={<Leagues />} />
+          <Route path="/jobs" element={<ScheduledJobs />} />
+          <Route path="/phase9" element={<Phase9 />} />
+          <Route path="/soccer" element={<SoccerHub />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-  );
-};
+)
 
-export default App;
+export default App
