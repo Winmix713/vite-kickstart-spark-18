@@ -19,7 +19,7 @@ const useHealth = () =>
   useQuery({
     queryKey: ["monitoring", "health"],
     queryFn: async (): Promise<HealthSummaryResponse> => {
-      const { data, error } = await supabase.functions.invoke<HealthSummaryResponse>("monitoring-health");
+      const { data, error } = await supabase.functions.invoke("monitoring-health");
       if (error) throw new Error(error.message);
       return data as HealthSummaryResponse;
     },
@@ -30,7 +30,7 @@ const useGraph = () =>
   useQuery({
     queryKey: ["monitoring", "graph"],
     queryFn: async (): Promise<ComputationGraphResponse> => {
-      const { data, error } = await supabase.functions.invoke<ComputationGraphResponse>("monitoring-computation-graph");
+      const { data, error } = await supabase.functions.invoke("monitoring-computation-graph");
       if (error) throw new Error(error.message);
       return data as ComputationGraphResponse;
     },
@@ -41,7 +41,7 @@ const useAlerts = () =>
   useQuery({
     queryKey: ["monitoring", "alerts"],
     queryFn: async (): Promise<AlertsResponse> => {
-      const { data, error } = await supabase.functions.invoke<AlertsResponse>("monitoring-alerts");
+      const { data, error } = await supabase.functions.invoke("monitoring-alerts");
       if (error) throw new Error(error.message);
       return data as AlertsResponse;
     },
@@ -52,7 +52,7 @@ const useMetrics = (component?: string | null) =>
   useQuery({
     queryKey: ["monitoring", "metrics", component ?? "all"],
     queryFn: async (): Promise<MetricsResponse> => {
-      const { data, error } = await supabase.functions.invoke<MetricsResponse>("monitoring-metrics", {
+      const { data, error } = await supabase.functions.invoke("monitoring-metrics", {
         body: component ? { component } : {},
       });
       if (error) throw new Error(error.message);

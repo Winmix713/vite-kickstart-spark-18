@@ -18,7 +18,7 @@ const styleSchema = z.record(z.string(), z.string().optional());
 type StyleFormData = z.infer<typeof styleSchema>;
 
 export const PropertiesPanel = () => {
-  const { selectedElement, updateCode } = useEditor();
+  const { selectedElement } = useEditor();
   const [searchTerm, setSearchTerm] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState("layout");

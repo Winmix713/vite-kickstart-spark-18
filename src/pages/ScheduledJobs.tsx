@@ -14,14 +14,11 @@ import { cn } from "@/lib/utils";
 import type {
   JobSummary,
   JobLog,
-  JobListResponse,
-  JobLogsResponse,
-  JobToggleResponse,
   JobTriggerResponse,
 } from "@/types/jobs";
 
 const fetchJobs = async (): Promise<JobSummary[]> => {
-  const { data, error } = await supabase.functions.invoke<JobListResponse>("jobs-list");
+  const { data, error } = await supabase.functions.invoke("jobs-list");
   if (error) {
     throw new Error(error.message ?? "Nem sikerült betölteni az ütemezett feladatokat");
   }
@@ -46,7 +43,7 @@ export default function ScheduledJobs() {
     if (!selectedJob) return [];
     const { data, error } = await supabase
       .functions
-      .invoke<JobLogsResponse>("jobs-logs", { body: { jobId: selectedJob.id, limit: 50 } });
+      .invoke("jobs-logs", { body: { jobId: selectedJob.id, limit: 50 } });
 
     if (error) {
       throw new Error(error.message ?? "Nem sikerült lekérni a futtatási naplókat");
@@ -66,7 +63,7 @@ export default function ScheduledJobs() {
     mutationFn: async ({ jobId, enabled }: { jobId: string; enabled: boolean }): Promise<JobSummary | undefined> => {
       const { data, error } = await supabase
         .functions
-        .invoke<JobToggleResponse>("jobs-toggle", { body: { jobId, enabled } });
+        .invoke("jobs-toggle", { body: { jobId, enabled } });
 
       if (error) {
         throw new Error(error.message ?? "Nem sikerült frissíteni a job állapotát");
@@ -93,7 +90,7 @@ export default function ScheduledJobs() {
     mutationFn: async ({ jobId, force }: { jobId: string; force?: boolean }): Promise<JobTriggerResponse["result"]> => {
       const { data, error } = await supabase
         .functions
-        .invoke<JobTriggerResponse>("jobs-trigger", { body: { jobId, force } });
+        .invoke("jobs-trigger", { body: { jobId, force } });
 
       if (error) {
         throw new Error(error.message ?? "Nem sikerült futtatni a jobot");

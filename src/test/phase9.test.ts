@@ -9,8 +9,7 @@ import {
 } from '@/lib/phase9-api';
 import type {
   UserPredictionForm,
-  FeatureGenerationRequest,
-  ExpectedValueCalculation
+  FeatureGenerationRequest
 } from '@/types/phase9';
 
 // Mock Supabase client

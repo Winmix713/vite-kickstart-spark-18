@@ -199,9 +199,7 @@ export class CollaborativeIntelligenceService {
 // 9.2 Market Integration API Services
 
 export class MarketIntegrationService {
-  private static readonly ODDS_API_BASE_URL = "https://api.the-odds-api.com/v4"
   private static readonly API_KEY = import.meta.env.VITE_ODDS_API_KEY || ""
-  private static readonly RATE_LIMIT_PER_HOUR = 500
 
   /**
    * Fetch odds from external API for a specific match

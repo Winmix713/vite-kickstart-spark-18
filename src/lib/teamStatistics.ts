@@ -113,7 +113,6 @@ export const calculateHeadToHeadStats = (matches: MatchResult[]) => {
 // Predict winner based on form and stats
 export const predictWinner = (matches: MatchResult[]): { prediction: string; confidence: number } => {
   const formIndex = calculateFormIndex(matches);
-  const _wins = matches.slice(0, 5).filter(m => m.result === 'W').length;
   
   let prediction = 'Döntetlen';
   let confidence = 50;

@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Users, 
   DollarSign, 
@@ -27,13 +26,6 @@ import { FreshnessIndicator } from './temporal-decay';
 import { ExperimentDashboard } from './self-improving-system';
 import { FeatureGenerationWizard } from './self-improving-system';
 
-// Import services for status checks
-import { 
-  CollaborativeIntelligenceService,
-  MarketIntegrationService,
-  TemporalDecayService,
-  SelfImprovingSystemService
-} from '@/lib/phase9-api';
 
 interface Phase9DashboardProps {
   matchId?: string; // Optional match ID for match-specific features

@@ -68,7 +68,7 @@ export const LayerPanel = ({ previewRef }: LayerPanelProps) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(state.htmlCode, "text/html");
     
-    const buildLayerTree = (element: Element, parentSelector = "", childIndex = 0): LayerItem[] => {
+    const buildLayerTree = (element: Element, parentSelector = ""): LayerItem[] => {
       const items: LayerItem[] = [];
       
       Array.from(element.children).forEach((child, index) => {
@@ -95,7 +95,7 @@ export const LayerPanel = ({ previewRef }: LayerPanelProps) => {
           name: displayName,
           type: tagName,
           selector: selector.trim(),
-          children: buildLayerTree(child, selector, index),
+          children: buildLayerTree(child, selector),
           visible: true,
           expanded: false,
         };

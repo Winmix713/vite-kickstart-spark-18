@@ -12,7 +12,7 @@ export interface EditorCanvasRef {
   previewRef: React.RefObject<HTMLDivElement>;
 }
 
-export const EditorCanvas = forwardRef<EditorCanvasRef, EditorCanvasProps>((props, ref) => {
+export const EditorCanvas = forwardRef<EditorCanvasRef, EditorCanvasProps>((_props, ref) => {
   const previewRef = useRef<HTMLDivElement>(null);
   const { state, uiState, selectedElement, setSelectedElement } = useEditor();
   const { htmlCode, cssCode } = state;

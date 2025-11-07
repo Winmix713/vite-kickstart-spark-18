@@ -19,10 +19,10 @@ export default function ReactFlow({ nodes, children }: { nodes: Node[]; edges?: 
             ...n.style,
           }}
         >
-          {n.data?.label ?? n.id}
+          {(n.data?.label as React.ReactNode) ?? n.id}
         </div>
       ))}
-      {children}
+      {children ? children : null}
     </div>
   );
 }
