@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import CorrelationHeatmap from "@/components/crossleague/CorrelationHeatmap";
@@ -9,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Brain, Network, Radar, RefreshCcw } from "lucide-react";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 interface LeagueRow { id: string; name: string; }
 
@@ -131,10 +130,7 @@ const CrossLeague = () => {
   }, [heatmapQuery.data]);
 
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <TopBar />
-      <main className="ml-0 md:ml-[84px] py-10 sm:py-14">
+    <MainLayout>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full ring-1 ring-primary/20 bg-primary/10 px-2.5 py-1 mb-2">
@@ -203,8 +199,7 @@ const CrossLeague = () => {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+      </MainLayout>
   );
 };
 

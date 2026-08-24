@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { AlertsResponse, ComputationGraphResponse, HealthSummaryResponse, MetricsResponse, PerformanceMetricRow } from "@/types/monitoring";
 import { RefreshCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 const useHealth = () =>
   useQuery({
@@ -94,10 +93,7 @@ export default function Monitoring() {
   const isLoading = healthQuery.isLoading || graphQuery.isLoading;
 
   return (
-    <div className="min-h-screen bg-black">
-      <Sidebar />
-      <TopBar />
-      <main className="lg:ml-64 pt-16 lg:pt-0">
+    <MainLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
@@ -198,7 +194,6 @@ export default function Monitoring() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+      </MainLayout>
   );
 }

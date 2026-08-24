@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 import ModelPerformanceChart, { PerformancePoint } from "@/components/ModelPerformanceChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 interface PredictionRow {
   created_at: string;
@@ -103,10 +102,7 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black">
-        <Sidebar />
-        <TopBar />
-        <main className="lg:ml-64 pt-16 lg:pt-0">
+      <MainLayout>
           <div className="container mx-auto px-4 py-8">
             <div className="mb-8">
               <Skeleton className="h-12 w-64 mb-2" />
@@ -119,16 +115,12 @@ export default function Analytics() {
             </div>
             <Skeleton className="h-96" />
           </div>
-        </main>
-      </div>
+        </MainLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
-      <Sidebar />
-      <TopBar />
-      <main className="lg:ml-64 pt-16 lg:pt-0">
+    <MainLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-gradient-emerald mb-2">Analytics</h1>
@@ -165,7 +157,6 @@ export default function Analytics() {
 
           <ModelPerformanceChart data={points} />
         </div>
-      </main>
-    </div>
+      </MainLayout>
   );
 }

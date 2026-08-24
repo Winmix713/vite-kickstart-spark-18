@@ -1,6 +1,4 @@
 import { useMemo, useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import ModelCard from "@/components/models/ModelCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +12,7 @@ import type { ModelExperiment, ModelRegistry } from "@/types/models";
 import { toast } from "sonner";
 import { Pie, PieChart, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 function useExperiments() {
   return useQuery<ModelExperiment[]>({
@@ -137,10 +136,7 @@ export default function ModelsPage() {
   const COLORS = ["#10b981", "#f59e0b", "#6366f1", "#ef4444", "#14b8a6"]; // emerald, amber, indigo, red, teal
 
   return (
-    <div className="min-h-screen bg-black">
-      <Sidebar />
-      <TopBar />
-      <main className="lg:ml-64 pt-16 lg:pt-0">
+    <MainLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
@@ -313,7 +309,6 @@ export default function ModelsPage() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </MainLayout>
   );
 }

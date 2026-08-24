@@ -1,19 +1,14 @@
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import HeroSection from "@/components/HeroSection";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <TopBar />
-      <main className="relative">
+    <MainLayout>
         <HeroSection />
         <section className="ml-0 md:ml-[84px] py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -38,9 +33,7 @@ const Index = () => {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+      </MainLayout>
   );
 };
 
