@@ -1,7 +1,6 @@
 import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import { Trophy } from "lucide-react";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 const leagueStandings = {
   angol: [
@@ -31,10 +30,7 @@ const Leagues = () => {
   const standings = leagueStandings[league];
 
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <TopBar />
-      <main className="ml-0 md:ml-[84px] py-10 sm:py-14">
+    <MainLayout>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
             <div className="inline-flex items-center gap-2 rounded-full ring-1 ring-primary/20 bg-primary/10 px-2.5 py-1 mb-2">
@@ -103,8 +99,7 @@ const Leagues = () => {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </MainLayout>
   );
 };
 

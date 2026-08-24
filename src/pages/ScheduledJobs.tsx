@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { RefreshCcw } from "lucide-react";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import JobStatusCard from "@/components/jobs/JobStatusCard";
 import { JobLogsDialog } from "@/components/jobs/JobLogsDialog";
 import { Button } from "@/components/ui/button";
@@ -11,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { MainLayout } from "@/components/layout/MainLayout";
 import type {
   JobSummary,
   JobLog,
@@ -146,10 +145,7 @@ export default function ScheduledJobs() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      <Sidebar />
-      <TopBar />
-      <main className="lg:ml-64 pt-16 lg:pt-0">
+    <MainLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
@@ -198,7 +194,6 @@ export default function ScheduledJobs() {
             </div>
           )}
         </div>
-      </main>
       <JobLogsDialog
         open={logsOpen}
         onOpenChange={handleCloseLogs}
@@ -207,6 +202,6 @@ export default function ScheduledJobs() {
         isLoading={logsQuery.isLoading}
         onRefresh={() => void logsQuery.refetch()}
       />
-    </div>
+    </MainLayout>
   );
 }

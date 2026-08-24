@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import RecentPredictions from "@/components/dashboard/RecentPredictions";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, RefreshCcw, Sparkles } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 interface PredictionListItem {
   id: string;
@@ -100,10 +98,7 @@ const PredictionsView = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <TopBar />
-      <main className="relative">
+    <MainLayout>
         <div className="ml-0 md:ml-[84px] py-10 sm:py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
@@ -142,9 +137,7 @@ const PredictionsView = () => {
             )}
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </MainLayout>
   );
 };
 

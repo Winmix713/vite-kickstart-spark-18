@@ -1,6 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
 import { ArrowLeft, TrendingUp, Users, Target, Shield, Activity, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatCard from "@/components/StatCard";
@@ -8,6 +6,7 @@ import { CSSBadge } from "@/components/CSSBadge";
 import { NarrativeSection } from "@/components/NarrativeSection";
 import TeamPatternsSection from "@/components/patterns/TeamPatternsSection";
 import { getMatchHistory } from "@/data/matchHistory";
+import { MainLayout } from "@/components/layout/MainLayout";
 import { 
   generateTeamStatistics, 
   calculateHeadToHeadStats, 
@@ -329,10 +328,7 @@ const TeamDetail = () => {
   const poissonGoals = calculatePoissonGoals(matches);
 
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <TopBar />
-      <main className="ml-0 md:ml-[84px] py-10 sm:py-14">
+    <MainLayout>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Button
             variant="outline"
@@ -535,8 +531,7 @@ const TeamDetail = () => {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </MainLayout>
   );
 };
 
