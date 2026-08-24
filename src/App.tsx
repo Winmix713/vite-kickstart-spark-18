@@ -20,6 +20,11 @@ import Analytics from "./pages/Analytics"
 import Models from "./pages/Models"
 import Monitoring from "./pages/Monitoring"
 import SoccerHub from "./pages/SoccerHub"
+import Profile from "./pages/Profile"
+import Editor from "./pages/Editor"
+import ComponentDetail from "./pages/ComponentDetail"
+import Auth from "./pages/Auth"
+import Upload from "./pages/Upload"
 
 const queryClient = new QueryClient()
 
@@ -46,6 +51,11 @@ const App = () => (
           <Route path="/jobs" element={<ScheduledJobs />} />
           <Route path="/phase9" element={<Phase9 />} />
           <Route path="/soccer" element={<SoccerHub />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/editor" element={<Editor />} />
+          <Route path="/upload" element={<Upload />} />
+          <Route path="/components/:id" element={<ComponentDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
