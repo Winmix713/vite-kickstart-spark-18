@@ -24,7 +24,7 @@ export const MainLayout = ({
       {showSidebar && <Sidebar />}
       {showTopBar && <TopBar />}
       
-      <main className={cn("flex-1 relative", className)}>
+      <main className={cn("flex-1 relative ml-0 md:ml-[84px]", className)}>
         {children}
       </main>
       

@@ -8,7 +8,9 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -54,7 +56,6 @@
     "input-otp": "^1.4.2",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.462.0",
-    "next": "16.0.1",
     "next-themes": "^0.3.0",
     "postcss-safe-parser": "^7.0.1",
     "react": "^18.3.1",
