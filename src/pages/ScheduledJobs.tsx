@@ -9,8 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import type {
 import { MainLayout } from "@/components/layout/MainLayout";
+import type {
   JobSummary,
   JobLog,
   JobTriggerResponse,
@@ -194,7 +194,6 @@ export default function ScheduledJobs() {
             </div>
           )}
         </div>
-      </main>
       <JobLogsDialog
         open={logsOpen}
         onOpenChange={handleCloseLogs}
@@ -203,6 +202,6 @@ export default function ScheduledJobs() {
         isLoading={logsQuery.isLoading}
         onRefresh={() => void logsQuery.refetch()}
       />
-    </div>
+    </MainLayout>
   );
 }

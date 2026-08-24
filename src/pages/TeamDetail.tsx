@@ -6,8 +6,8 @@ import { CSSBadge } from "@/components/CSSBadge";
 import { NarrativeSection } from "@/components/NarrativeSection";
 import TeamPatternsSection from "@/components/patterns/TeamPatternsSection";
 import { getMatchHistory } from "@/data/matchHistory";
-import { 
 import { MainLayout } from "@/components/layout/MainLayout";
+import { 
   generateTeamStatistics, 
   calculateHeadToHeadStats, 
   predictWinner,
