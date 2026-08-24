@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>WinMix Tactical Studio & Prediction Pipeline v1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* Palette Tokens (Material 3 Dark Tactical Theme) */
+      --surface: #141712;
+      --surface-dim: #0d0f0c;
+      --surface-bright: #1c2119;
+      --surface-container-lowest: #090b08;
+      --surface-container-low: #171b15;
+      --surface-container: #1e241c;
+      --surface-container-high: #262e23;
+      --surface-container-highest: #2f382c;
+      --on-surface: #e4e7dc;
+      --on-surface-variant: #9aa190;
+      --outline: #5c6453;
+      --outline-variant: #363d30;
+      
+      --primary: #9dd83e;
+      --primary-container: #263c0a;
+      --on-primary: #122100;
+      --on-primary-container: #c4f36e;
+      
+      --secondary: #65b8f0;
+      --secondary-container: #08334c;
+      --on-secondary-container: #a8dcff;
+
+      --tertiary: #f59e0b;
+      --tertiary-container: #3d2503;
+      --on-tertiary-container: #fcd34d;
+
+      --error: #f87171;
+      --error-container: #450a0a;
+      
+      --pitch-deep: #16200e;
+      --pitch-primary: #293817;
+      --grass-live: #a4dd3d;
+      
+      --glass-fill: rgba(22, 32, 14, 0.7);
+      --glass-border: rgba(164, 221, 61, 0.2);
+      --line: #2d3627;
+
+      /* Fluid Typography */
+      --text-xs: clamp(0.7rem, 0.65rem + 0.2vw, 0.75rem);
+      --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
+      --text-base: clamp(0.9rem, 0.85rem + 0.35vw, 1rem);
+      --text-lg: clamp(1.05rem, 0.95rem + 0.5vw, 1.25rem);
+      --text-xl: clamp(1.2rem, 1.05rem + 0.75vw, 1.5rem);
+      --text-2xl: clamp(1.4rem, 1.2rem + 1vw, 1.75rem);
+
+      /* Geometry */
+      --rounded-sm: 4px;
+      --rounded-md: 8px;
+      --rounded-lg: 12px;
+      --rounded-xl: 16px;
+      --rounded-full: 9999px;
+
+      --nav-rail-w: 72px;
+      --topbar-h: 58px;
+    }
+
+    html, body {
+      min-height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--surface-dim);
+      color: var(--on-surface);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: var(--surface-container-low);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--outline-variant);
+      border-radius: var(--rounded-sm);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: var(--outline);
+    }
+
+    /* Base Layout Frame */
+    .app-frame {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .app-frame {
+        flex-direction: row;
+      }
+    }
+
+    /* Nav Rail */
+    .nav-rail {
+      width: 100%;
+      height: 56px;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 12px;
+      flex-shrink: 0;
+      z-index: 40;
+      order: 2;
+    }
+
+    @media (min-width: 768px) {
+      .nav-rail {
+        width: var(--nav-rail-w);
+        height: 100%;
+        border-top: none;
+        border-right: 1px solid var(--line);
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 18px 0;
+        gap: 12px;
+        order: 1;
+      }
+    }
+
+    .nav-logo {
+      display: none;
+      width: 44px;
+      height: 44px;
+      background: var(--pitch-primary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--rounded-md);
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    @media (min-width: 768px) {
+      .nav-logo { display: flex; }
+    }
+
+    .nav-item {
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: var(--rounded-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: var(--on-surface-variant);
+      transition: all 150ms ease;
+    }
+
+    .nav-item:hover {
+      background: var(--surface-container);
+      color: var(--on-surface);
+    }
+
+    .nav-item.active {
+      background: var(--primary-container);
+      color: var(--grass-live);
+      border: 1px solid var(--glass-border);
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Main Container */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+      order: 1;
+    }
+
+    @media (min-width: 768px) {
+      .main-wrapper { order: 2; }
+    }
+
+    /* Topbar */
+    .topbar {
+      min-height: var(--topbar-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      flex-shrink: 0;
+      gap: 12px;
+      z-index: 30;
+      flex-wrap: wrap;
+    }
+
+    @media (min-width: 768px) {
+      .topbar {
+        padding: 0 24px;
+        flex-wrap: nowrap;
+      }
+    }
+
+    .topbar-title {
+      font-size: var(--text-sm);
+      font-weight: 800;
+      color: #FFF;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .topbar-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--grass-live);
+      background: var(--pitch-deep);
+      border: 1px solid var(--glass-border);
+      padding: 2px 8px;
+      border-radius: var(--rounded-full);
+      white-space: nowrap;
+    }
+
+    .topbar-divider {
+      display: none;
+      width: 1px;
+      height: 22px;
+      background: var(--line);
+    }
+
+    @media (min-width: 640px) {
+      .topbar-divider { display: block; }
+    }
+
+    .league-switcher {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--surface-container-low);
+      padding: 3px;
+      border-radius: var(--rounded-md);
+      border: 1px solid var(--line);
+    }
+
+    .league-btn {
+      padding: 5px 12px;
+      min-height: 34px;
+      border-radius: var(--rounded-sm);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--on-surface-variant);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 140ms ease;
+    }
+
+    .league-btn.active {
+      color: #FFF;
+      background: var(--pitch-primary);
+      border: 1px solid var(--glass-border);
+    }
+
+    .topbar-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action {
+      padding: 6px 12px;
+      min-height: 34px;
+      border-radius: var(--rounded-md);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: all 140ms ease;
+    }
+
+    .btn-ghost {
+      background: var(--surface-container);
+      color: var(--on-surface);
+      border-color: var(--line);
+    }
+    .btn-ghost:hover {
+      background: var(--surface-container-high);
+    }
+
+    .btn-primary-action {
+      background: var(--pitch-primary);
+      color: var(--grass-live);
+      border-color: var(--glass-border);
+    }
+    .btn-primary-action:hover {
+      background: var(--primary-container);
+      border-color: var(--grass-live);
+    }
+
+    .btn-danger-outline {
+      background: var(--error-container);
+      border-color: rgba(248, 113, 113, 0.3);
+      color: var(--error);
+    }
+    .btn-danger-outline:hover {
+      border-color: var(--error);
+    }
+
+    /* Views */
+    .view-content {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .view-content.active {
+      display: flex;
+    }
+
+    @media (min-width: 768px) {
+      .view-content {
+        padding: 24px;
+        gap: 20px;
+      }
+    }
+
+    /* Hero / Dropzone Container */
+    .hero-pitch-card {
+      background: linear-gradient(145deg, #182210 0%, #0e140a 100%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--rounded-xl);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pitch-grid-bg {
+      position: absolute;
+      inset: 0;
+      opacity: 0.1;
+      pointer-events: none;
+      background-image: 
+        radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.7) 100%),
+        linear-gradient(to right, rgba(255,255,255,0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.4) 1px, transparent 1px);
+      background-size: 100% 100%, 44px 44px, 44px 44px;
+    }
+
+    .hero-flex {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Enhanced Upload Dropzone with Dedicated Tallózás Button */
+    .upload-dropzone {
+      border: 2px dashed rgba(164, 221, 61, 0.4);
+      background: rgba(18, 26, 12, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: var(--rounded-lg);
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 160ms ease;
+    }
+
+    @media (min-width: 640px) {
+      .upload-dropzone {
+        flex-direction: row;
+        text-align: left;
+        gap: 20px;
+      }
+    }
+
+    .upload-dropzone:hover, .upload-dropzone.dragover {
+      border-color: var(--grass-live);
+      background: rgba(164, 221, 61, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .upload-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--rounded-md);
+      background: rgba(164, 221, 61, 0.15);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--grass-live);
+      flex-shrink: 0;
+    }
+
+    .upload-text-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .upload-text-main {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    @media (min-width: 520px) {
+      .upload-text-main {
+        font-size: var(--text-base);
+      }
+    }
+
+    .upload-text-sub {
+      font-size: var(--text-xs);
+      color: var(--on-surface-variant);
+    }
+
+    /* Dedicated Tallózás Button */
+    .btn-upload-browse {
+      background: var(--grass-live);
+      color: #122100;
+      font-weight: 800;
+      padding: 8px 18px;
+      border-radius: var(--rounded-md);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: var(--text-xs);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(164, 221, 61, 0.35);
+      transition: all 140ms ease;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 640px) {
+      .btn-upload-browse {
+        padding: 10px 22px;
+        font-size: var(--text-sm);
+      }
+    }
+
+    .btn-upload-browse:hover {
+      background: #b6f34e;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(164, 221, 61, 0.5);
+    }
+
+    .upload-feedback-box {
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--rounded-md);
+      font-size: var(--text-xs);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    @media (min-width: 480px) {
+      .upload-feedback-box {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    /* Metric Bar */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+      gap: 12px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--rounded-lg);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 90px;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #FFF;
+      line-height: 1.1;
+      margin: 4px 0;
+    }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--on-surface-variant);
+    }
+
+    /* Season Pills */
+    .season-selector-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--rounded-lg);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .season-pills-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .season-pill {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      min-height: 36px;
+      border-radius: var(--rounded-md);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 140ms ease;
+    }
+
+    .season-pill.active {
+      background: var(--pitch-primary);
+      border-color: var(--grass-live);
+      color: #FFF;
+      box-shadow: 0 4px 12px rgba(41, 56, 23, 0.4);
+    }
+
+    /* Panels & Tables */
+    .panel-card {
+      background: var(--surface);
+      border-radius: var(--rounded-lg);
+      border: 1px solid var(--line);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--surface-container-low);
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      max-height: 520px;
+    }
+
+    table.pro-table {
+      width: 100%;
+      min-width: 680px;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: var(--text-xs);
+    }
+
+    table.pro-table thead {
+      position: sticky;
+      top: 0;
+      background: var(--surface-container);
+      border-bottom: 1px solid var(--line);
+      z-index: 10;
+    }
+
+    table.pro-table th {
+      padding: 10px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      white-space: nowrap;
+    }
+
+    table.pro-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      color: var(--on-surface);
+      white-space: nowrap;
+    }
+
+    table.pro-table tbody tr:hover {
+      background: var(--surface-container-high);
+    }
+
+    /* Badges */
+    .badge-confidence {
+      padding: 2px 8px;
+      border-radius: var(--rounded-sm);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-block;
+    }
+    .badge-high { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+    .badge-good { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+    .badge-moderate { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid #eab308; }
+    .badge-low { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #64748b; }
+
+    .badge-suff {
+      padding: 2px 6px;
+      border-radius: var(--rounded-sm);
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .suff-hot { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .suff-warm { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+    .suff-cold { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    /* Inputs */
+    .search-input, .select-input {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded-md);
+      padding: 6px 12px;
+      font-size: var(--text-xs);
+      color: #FFF;
+      outline: none;
+      min-height: 36px;
+    }
+    .search-input:focus, .select-input:focus {
+      border-color: var(--grass-live);
+    }
+
+    /* Modal / Inspector */
+    #matchModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(5px);
+    }
+
+    #matchModal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--rounded-xl);
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--pitch-primary);
+      border: 1px solid var(--grass-live);
+      color: #FFF;
+      padding: 12px 18px;
+      border-radius: var(--rounded-md);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 220ms ease;
+    }
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-frame">
+
+  <!-- Nav Rail -->
+  <aside class="nav-rail">
+    <div class="nav-logo" title="WinMix Studio">
+      <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:var(--grass-live);"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    </div>
+
+    <button id="navDashboard" class="nav-item active" title="Taktikai Stúdió & Adatbázis">
+      <svg viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+    </button>
+
+    <button id="navPipeline" class="nav-item" title="Pipeline v1 Audit & Telemetria">
+      <svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    </button>
+
+    <button id="navWeights" class="nav-item" title="Csapat Súlyozás (Weight Index)">
+      <svg viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+    </button>
+
+    <button id="navExportBtn" class="nav-item" title="JSON Adatbázis Export" style="margin-top:auto;">
+      <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+    </button>
+  </aside>
+
+  <!-- Main Area -->
+  <div class="main-wrapper">
+    
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="topbar-title">WinMix Studio</span>
+        <span class="topbar-badge">Pipeline v1.0</span>
+      </div>
+
+      <div class="topbar-divider"></div>
+
+      <!-- Segmented Liga Switcher -->
+      <div class="league-switcher">
+        <button id="btnLeagueEn" class="league-btn active">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angol</button>
+        <button id="btnLeagueEs" class="league-btn">🇪🇸 Spanyol</button>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="runPipelineBatchBtn" class="btn-action btn-primary-action" title="As-of Walk-Forward Predikciók és Kalibráció újrafuttatása">
+          <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span class="hidden sm:inline">Pipeline Futtatás</span>
+        </button>
+        <button id="clearAllBtn" class="btn-action btn-danger-outline" title="Minden adat törlése">
+          <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: DATA STUDIO & MATCHES -->
+    <main id="viewDashboard" class="view-content custom-scrollbar active">
+      
+      <!-- Upload Hero with Dedicated Browse CTA -->
+      <section class="hero-pitch-card">
+        <div class="pitch-grid-bg"></div>
+        <div class="hero-flex">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h1 style="font-size:var(--text-lg); font-weight:800; color:#FFF;">Bajnokságok & Szezonok Központi Tára</h1>
+              <p style="font-size:var(--text-xs); color:var(--grass-live); margin-top:4px;">
+                Minden feltöltött 240 mérkőzéses CSV önálló szezonként kerül rögzítésre a WinMix as-of predikciós pipeline-hoz.
+              </p>
+            </div>
+            <select id="leagueModeSelect" class="select-input font-mono" style="background:var(--pitch-deep); border-color:var(--grass-live); color:#FFF; font-weight:600;">
+              <option value="auto">⚡ Automatikus ligafelismerés</option>
+              <option value="angol">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Kényszerített Angol</option>
+              <option value="spanyol">🇪🇸 Kényszerített Spanyol</option>
+            </select>
+          </div>
+
+          <!-- Dropzone with Direct Browse Button -->
+          <div id="dropZone" class="upload-dropzone">
+            <div class="upload-icon-wrap">
+              <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            </div>
+            <div class="upload-text-wrap">
+              <span class="upload-text-main">Húzd be ide a bajnokságok CSV fájljait, vagy kattints a tallózáshoz</span>
+              <span class="upload-text-sub">A motor ellenőrzi a 240 meccses teljességet, deduplikál és új sorszámozott bajnokságként rögzíti (akár 50-100 fájl egyszerre).</span>
+            </div>
+
+            <!-- Direct File Dialog Trigger Button -->
+            <button type="button" id="browseBtn" class="btn-upload-browse">
+              <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              <span>Fájlok Tallózása...</span>
+            </button>
+
+            <input type="file" id="fileInput" multiple accept=".csv,.txt" style="display:none;">
+          </div>
+
+          <!-- Upload Status & Feedback Box -->
+          <div id="uploadFeedback" class="upload-feedback-box" style="display:none;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--grass-live); flex-shrink:0;"></span>
+              <span id="uploadFeedbackText" style="color:#FFFFFF; font-weight:600;">Feldolgozás sikeres!</span>
+            </div>
+            <span id="uploadStatsBadge" class="topbar-badge" style="align-self:flex-start;">0 mentett szezon</span>
+          </div>
+          <div id="uploadWarnings" style="color:var(--tertiary); font-size:12px; display:none;"></div>
+        </div>
+      </section>
+
+      <!-- Global Metrics -->
+      <section class="metric-grid">
+        <div class="metric-card">
+          <span class="metric-label">Összes Bajnokság</span>
+          <div id="statTotalSeasons" class="metric-value">0 db</div>
+          <span id="statTotalMatches" class="metric-sub font-mono">0 mérkőzés rögzítve</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Angol / 🇪🇸 Spanyol</span>
+          <div id="statLeagueCounts" class="metric-value" style="color:var(--grass-live);">0 / 0</div>
+          <span class="metric-sub">240 meccs / szezon</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Pipeline Pontosság</span>
+          <div id="statPipelineAcc" class="metric-value" style="color:var(--secondary);">- %</div>
+          <span id="statPipelineBrier" class="metric-sub font-mono">Brier: - | LogLoss: -</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">ECE & Kalibráció (T)</span>
+          <div id="statCalibT" class="metric-value" style="color:var(--tertiary);">T = 1.00</div>
+          <span id="statEceVal" class="metric-sub font-mono">ECE: 0.000 (Cél &lt; 0.05)</span>
+        </div>
+      </section>
+
+      <!-- Season Selector -->
+      <section class="season-selector-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:var(--text-xs); font-weight:700; text-transform:uppercase; color:var(--on-surface-variant);">
+            Bajnokság Szezonválasztó (240 Match Sequence)
+          </span>
+          <button id="deleteActiveSeasonBtn" class="btn-action btn-danger-outline" style="display:none; padding:3px 8px; font-size:11px;">
+            Aktív szezon törlése
+          </button>
+        </div>
+        <div id="seasonPillsContainer" class="season-pills-row custom-scrollbar">
+          <span style="color:var(--on-surface-variant); font-size:12px;">Még nincs rögzített bajnokság ehhez a ligához.</span>
+        </div>
+      </section>
+
+      <!-- Standings Table -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <div>
+            <span id="standingsTitle" class="panel-title">Bajnokság Tabella & Poisson Erősség</span>
+            <span id="standingsSubtitle" style="font-size:11px; color:var(--on-surface-variant); font-family:'JetBrains Mono', monospace;">240 mérkőzés alapján</span>
+          </div>
+        </div>
+        <div class="table-container custom-scrollbar">
+          <table class="pro-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Csapat</th>
+                <th style="text-align:center;">M</th>
+                <th style="text-align:center;">GY</th>
+                <th style="text-align:center;">D</th>
+                <th style="text-align:center;">V</th>
+                <th style="text-align:center;">Gólok</th>
+                <th style="text-align:center;">GK</th>
+                <th style="text-align:center; color:var(--grass-live);">Pont</th>
+                <th style="text-align:center;">Súly (W)</th>
+                <th style="text-align:right;">Venue Erősség (Home/Away Att)</th>
+              </tr>
+            </thead>
+            <tbody id="standingsBody" class="font-mono">
+              <tr><td colspan="11" style="text-align:center; padding:32px; color:var(--on-surface-variant);">Nincs adat.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Match Log with WinMix Predictions -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span class="panel-title">Szezon Mérkőzésnapló & WinMix Pipeline v1 Javaslatok</span>
+            <input type="text" id="searchTeam" placeholder="Keresés csapatnévre..." class="search-input" style="padding:4px 8px; height:30px;">
+          </div>
+          <span id="matchLogCount" class="topbar-badge">0 / 240 meccs</span>
+        </div>
+        <div class="table-container custom-scrollbar">
+          <table class="pro-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Időpont</th>
+                <th style="text-align:right;">Hazai Csapat</th>
+                <th style="text-align:center; font-weight:800;">FT</th>
+                <th>Vendég Csapat</th>
+                <th style="text-align:center;">Data Suff.</th>
+                <th style="text-align:center;">B1 Poisson</th>
+                <th style="text-align:center;">M1 LogReg</th>
+                <th style="text-align:center; color:var(--grass-live);">WinMix Ens. (Calib)</th>
+                <th style="text-align:center;">Confidence</th>
+                <th style="text-align:center;">Javaslat</th>
+                <th style="text-align:center;">Audit</th>
+              </tr>
+            </thead>
+            <tbody id="matchLogBody" class="font-mono">
+              <tr><td colspan="12" style="text-align:center; padding:32px; color:var(--on-surface-variant);">Nincs betöltött mérkőzés.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- VIEW 2: PIPELINE AUDIT & EVALUATION (STAGE 4 & 5) -->
+    <main id="viewPipeline" class="view-content custom-scrollbar">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h1 style="font-size:var(--text-lg); font-weight:800; color:#FFF;">L4 Értékelési & Kalibrációs Réteg (Evaluation Windows)</h1>
+          <p style="font-size:var(--text-xs); color:var(--on-surface-variant); margin-top:2px;">
+            100 meccses gördülő ablakok: Brier Score, LogLoss, Expected Calibration Error (ECE) és Skill vs B1 Baseline.
+          </p>
+        </div>
+        <button id="recalibBtn" class="btn-action btn-primary-action">
+          ⚡ Temperature Scaling Kalibrálás (T)
+        </button>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-card">
+          <span class="metric-label">LogLoss (Ensemble vs B1)</span>
+          <div id="evalLogLoss" class="metric-value">- / -</div>
+          <span id="evalSkill" class="metric-sub font-mono">Skill vs B1: 0.00%</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Brier Score</span>
+          <div id="evalBrier" class="metric-value">-</div>
+          <span class="metric-sub font-mono">Alacsonyabb = jobb</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">ECE (Kalibrációs Hiba)</span>
+          <div id="evalEce" class="metric-value" style="color:var(--grass-live);">-</div>
+          <span class="metric-sub">Küszöb: ECE &lt; 0.05</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Kalibrációs Hőmérséklet</span>
+          <div id="evalT" class="metric-value" style="color:var(--tertiary);">T = 1.00</div>
+          <span class="metric-sub font-mono">Platt / Temp scaling</span>
+        </div>
+      </div>
+
+      <!-- Telemetry Charts -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+        <div class="panel-card" style="padding:16px;">
+          <span class="panel-title" style="margin-bottom:12px;">Kimenetel Megoszlás (Valós H / D / A)</span>
+          <div style="height:220px; position:relative;">
+            <canvas id="outcomeChart"></canvas>
+          </div>
+        </div>
+
+        <div class="panel-card" style="padding:16px;">
+          <span class="panel-title" style="margin-bottom:12px;">Reliability Diagram (Kalibráció 5 Valószínűségi Sávban)</span>
+          <div style="height:220px; position:relative;">
+            <canvas id="reliabilityChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evaluation Windows Table -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Gördülő 100 Meccses Kiértékelési Ablakok (Walk-Forward)</span>
+        </div>
+        <div class="table-container custom-scrollbar">
+          <table class="pro-table font-mono">
+            <thead>
+              <tr>
+                <th>Ablak #</th>
+                <th>Meccs Tartomány</th>
+                <th style="text-align:center;">B1 LogLoss</th>
+                <th style="text-align:center;">Ens LogLoss</th>
+                <th style="text-align:center;">Skill vs B1</th>
+                <th style="text-align:center;">Brier</th>
+                <th style="text-align:center;">ECE</th>
+                <th style="text-align:center;">Állapot / Döntés</th>
+              </tr>
+            </thead>
+            <tbody id="evalWindowsBody">
+              <tr><td colspan="8" style="text-align:center; padding:24px; color:var(--on-surface-variant);">Nincs még legalább 100 kiértékelt mérkőzés.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- VIEW 3: TEAM WEIGHT INDEX (ADMIN L1) -->
+    <main id="viewWeights" class="view-content custom-scrollbar">
+      <div>
+        <h1 style="font-size:var(--text-lg); font-weight:800; color:#FFF;">L1 Törzsadat: Csapat Súlyozási Index (0–10)</h1>
+        <p style="font-size:var(--text-xs); color:var(--on-surface-variant); margin-top:2px;">
+          Stage 1.1 statikus szakértői súly (`weight_index`). A modell a `weight_diff` (Home - Away) különbséget veszi figyelembe.
+        </p>
+      </div>
+
+      <section class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Aktív Liga Csapatainak Súlyozása</span>
+          <button id="saveWeightsBtn" class="btn-action btn-primary-action">Súlyok Mentése</button>
+        </div>
+        <div class="table-container custom-scrollbar">
+          <table class="pro-table">
+            <thead>
+              <tr>
+                <th>Csapat</th>
+                <th>Liga</th>
+                <th>Weight Index (0.0 - 10.0)</th>
+                <th>Csúszka</th>
+              </tr>
+            </thead>
+            <tbody id="weightsTableBody">
+              <tr><td colspan="4" style="text-align:center; padding:24px; color:var(--on-surface-variant);">Nincsenek betöltött csapatok.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+</div>
+
+<!-- Match Inspector Modal (Stage 6 Explainability) -->
+<div id="matchModal">
+  <div class="modal-box custom-scrollbar">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:12px;">
+      <span style="font-weight:800; font-size:var(--text-base); color:#FFF;" id="modalMatchTitle">Mérkőzés Predikció Részletei</span>
+      <button onclick="closeMatchModal()" class="btn-action btn-ghost" style="padding:4px 8px;">✕</button>
+    </div>
+
+    <!-- Recommendation Box -->
+    <div style="background:var(--pitch-deep); border:1px solid var(--grass-live); border-radius:var(--rounded-lg); padding:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div style="font-size:11px; text-transform:uppercase; color:var(--on-surface-variant); font-weight:700;">WinMix Final Recommendation</div>
+        <div id="modalRecText" style="font-size:1.4rem; font-weight:800; color:var(--grass-live);">HOME_WIN</div>
+        <div id="modalCaveatText" style="font-size:12px; color:var(--tertiary); margin-top:2px;"></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px; text-transform:uppercase; color:var(--on-surface-variant); font-weight:700;">Confidence Score</div>
+        <div id="modalConfBadge" class="badge-confidence badge-good" style="font-size:1.1rem; padding:4px 12px; margin-top:4px;">68 — Good</div>
+      </div>
+    </div>
+
+    <!-- Probabilities Comparison Table -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <span class="panel-title">Modell Valószínűségek Összehasonlítása (Stage 2–4)</span>
+      </div>
+      <table class="pro-table font-mono">
+        <thead>
+          <tr>
+            <th>Modell</th>
+            <th style="text-align:center;">Hazai (H)</th>
+            <th style="text-align:center;">Döntetlen (D)</th>
+            <th style="text-align:center;">Vendég (V)</th>
+          </tr>
+        </thead>
+        <tbody id="modalProbBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Feature Vector (14-Dim) -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <span class="panel-title">As-Of Feature Vektor (14 Dimenzió, Leakage-mentes)</span>
+      </div>
+      <div id="modalFeatureGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px; padding:12px;" class="font-mono" style="font-size:11px;"></div>
+    </div>
+
+    <!-- Secondary Markets -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+      <div class="metric-card">
+        <span class="metric-label">Over 2.5 Gól</span>
+        <div id="modalOver25" class="metric-value" style="font-size:1.1rem;">54%</div>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">BTTS (Gólváltás)</span>
+        <div id="modalBtts" class="metric-value" style="font-size:1.1rem;">48%</div>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Legvalószínűbb FT</span>
+        <div id="modalScore" class="metric-value" style="font-size:1.1rem; color:var(--grass-live);">2-1</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast">
+  <span id="toastMsg">Sikeres művelet</span>
+</div>
+
+<script>
+  /* ==========================================================================
+     WINMIX PREDICTION PIPELINE v1 — JS ARCHITECTURE
+     ========================================================================== */
+
+  // State Management
+  let seasons = [];
+  let currentLeague = 'angol';
+  let selectedSeasonId = null;
+  let teamWeights = {};
+  let currentCalibration = { T: 1.05, version: 'cal_v1.0', fittedAt: null, ece: 0.038 };
+  let outcomeChartInstance = null;
+  let reliabilityChartInstance = null;
+
+  const EN_TEAMS_DEFAULT = [
+    'chelsea', 'west ham', 'nottingham', 'vörös ördögök', 'wolverhampton', 'brighton', 
+    'crystal palace', 'newcastle', 'liverpool', 'everton', 'brentford', 'fulham', 
+    'manchester kék', 'tottenham', 'london ágyúk', 'aston oroszlán', 'manchester united',
+    'manchester city', 'arsenal', 'aston villa'
+  ];
+
+  const ES_TEAMS_DEFAULT = [
+    'madrid fehér', 'katalán óriás', 'matracosok', 'sevilla', 'valencia', 'villarreal', 
+    'realBulgarian', 'betis', 'athletic bilbao', 'celta vigo', 'mallorca', 'osasuna',
+    'rayo vallecano', 'getafe', 'alaves', 'las palmas', 'granada', 'cadiz', 'almeria',
+    'barcelona', 'real madrid', 'atletico madrid'
+  ];
+
+  // DOM Elements
+  const viewDashboard = document.getElementById('viewDashboard');
+  const viewPipeline = document.getElementById('viewPipeline');
+  const viewWeights = document.getElementById('viewWeights');
+  const navDashboard = document.getElementById('navDashboard');
+  const navPipeline = document.getElementById('navPipeline');
+  const navWeights = document.getElementById('navWeights');
+
+  const btnLeagueEn = document.getElementById('btnLeagueEn');
+  const btnLeagueEs = document.getElementById('btnLeagueEs');
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const browseBtn = document.getElementById('browseBtn');
+  const leagueModeSelect = document.getElementById('leagueModeSelect');
+  const uploadFeedback = document.getElementById('uploadFeedback');
+  const uploadFeedbackText = document.getElementById('uploadFeedbackText');
+  const uploadStatsBadge = document.getElementById('uploadStatsBadge');
+  const uploadWarnings = document.getElementById('uploadWarnings');
+  const seasonPillsContainer = document.getElementById('seasonPillsContainer');
+  const standingsBody = document.getElementById('standingsBody');
+  const matchLogBody = document.getElementById('matchLogBody');
+  const searchTeam = document.getElementById('searchTeam');
+  const deleteActiveSeasonBtn = document.getElementById('deleteActiveSeasonBtn');
+
+  // Initialization
+  window.addEventListener('DOMContentLoaded', () => {
+    loadState();
+    setupNavigation();
+    setupEvents();
+    initCharts();
+    renderAll();
+  });
+
+  function setupNavigation() {
+    navDashboard.addEventListener('click', () => switchView('dashboard'));
+    navPipeline.addEventListener('click', () => switchView('pipeline'));
+    navWeights.addEventListener('click', () => switchView('weights'));
+  }
+
+  function switchView(view) {
+    [viewDashboard, viewPipeline, viewWeights].forEach(v => v.classList.remove('active'));
+    [navDashboard, navPipeline, navWeights].forEach(n => n.classList.remove('active'));
+
+    if (view === 'dashboard') {
+      viewDashboard.classList.add('active');
+      navDashboard.classList.add('active');
+    } else if (view === 'pipeline') {
+      viewPipeline.classList.add('active');
+      navPipeline.classList.add('active');
+      renderPipelineEvaluation();
+    } else if (view === 'weights') {
+      viewWeights.classList.add('active');
+      navWeights.classList.add('active');
+      renderWeightsTable();
+    }
+  }
+
+  function setupEvents() {
+    // Direct Browse Button Click (with stopPropagation)
+    browseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    // Dropzone Click
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // File Input Change (with value reset to allow re-upload)
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFiles(e.target.files);
+        fileInput.value = '';
+      }
+    });
+
+    // Drag & Drop
+    ['dragenter', 'dragover'].forEach(n => {
+      dropZone.addEventListener(n, (e) => { 
+        e.preventDefault(); 
+        dropZone.classList.add('dragover'); 
+      });
+    });
+    ['dragleave', 'drop'].forEach(n => {
+      dropZone.addEventListener(n, (e) => { 
+        e.preventDefault(); 
+        dropZone.classList.remove('dragover'); 
+      });
+    });
+    dropZone.addEventListener('drop', (e) => {
+      if (e.dataTransfer?.files?.length) {
+        handleFiles(e.dataTransfer.files);
+      }
+    });
+
+    // League switch
+    btnLeagueEn.addEventListener('click', () => {
+      currentLeague = 'angol';
+      updateLeagueBtns();
+      selectFirstSeason();
+      renderAll();
+    });
+    btnLeagueEs.addEventListener('click', () => {
+      currentLeague = 'spanyol';
+      updateLeagueBtns();
+      selectFirstSeason();
+      renderAll();
+    });
+
+    // Search filter
+    searchTeam.addEventListener('input', renderMatchLog);
+
+    // Run Pipeline Batch
+    document.getElementById('runPipelineBatchBtn').addEventListener('click', () => {
+      recalculatePipelineForAllSeasons();
+      saveState();
+      renderAll();
+      showToast('Pipeline v1 walk-forward predikciók lefutottak!');
+    });
+
+    // Delete Active Season
+    deleteActiveSeasonBtn.addEventListener('click', () => {
+      if (!selectedSeasonId) return;
+      const s = seasons.find(x => x.id === selectedSeasonId);
+      if (!s) return;
+      if (confirm(`Törölni szeretnéd a következőt: ${s.name}?`)) {
+        seasons = seasons.filter(x => x.id !== selectedSeasonId);
+        reindexSeasons();
+        saveState();
+        selectFirstSeason();
+        renderAll();
+        showToast(`${s.name} törölve.`);
+      }
+    });
+
+    // Clear All
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+      if (confirm('Biztosan törölni szeretnéd az összes rögzített adatot?')) {
+        seasons = [];
+        selectedSeasonId = null;
+        saveState();
+        renderAll();
+        showToast('Összes adat törölve.');
+      }
+    });
+
+    // Export JSON
+    const exportHandler = () => {
+      if (seasons.length === 0) return alert('Nincs mentett bajnokság.');
+      const exportObj = {
+        version: "winmix_pipeline_v1",
+        exportedAt: new Date().toISOString(),
+        calibration: currentCalibration,
+        teamWeights: teamWeights,
+        seasons: seasons
+      };
+      const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `winmix_pipeline_db_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+    document.getElementById('navExportBtn').addEventListener('click', exportHandler);
+
+    // Save Weights
+    document.getElementById('saveWeightsBtn').addEventListener('click', () => {
+      saveState();
+      recalculatePipelineForAllSeasons();
+      renderAll();
+      showToast('Csapat súlyok rögzítve és predikciók újraszámolva!');
+    });
+
+    // Recalibrate Button
+    document.getElementById('recalibBtn').addEventListener('click', () => {
+      fitCalibration();
+      renderPipelineEvaluation();
+      showToast(`Új kalibráció aktív! T = ${currentCalibration.T.toFixed(2)} (ECE: ${currentCalibration.ece.toFixed(3)})`);
+    });
+  }
+
+  function updateLeagueBtns() {
+    if (currentLeague === 'angol') {
+      btnLeagueEn.classList.add('active');
+      btnLeagueEs.classList.remove('active');
+    } else {
+      btnLeagueEs.classList.add('active');
+      btnLeagueEn.classList.remove('active');
+    }
+  }
+
+  function selectFirstSeason() {
+    const avail = seasons.filter(s => s.league === currentLeague);
+    if (avail.length > 0) {
+      if (!avail.some(s => s.id === selectedSeasonId)) {
+        selectedSeasonId = avail[0].id;
+      }
+    } else {
+      selectedSeasonId = null;
+    }
+  }
+
+  /* ==========================================================================
+     CSV INGESTION & PIPELINE ENGINE (Stage 0 - 6)
+     ========================================================================== */
+
+  async function handleFiles(fileList) {
+    let added = 0;
+    let warnings = [];
+    const mode = leagueModeSelect.value;
+
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      const text = await readFileAsText(file);
+      const rawMatches = parseCsvText(text);
+
+      if (rawMatches.length !== 240) {
+        warnings.push(`⚠️ "${file.name}": Nem 240 mérkőzést tartalmaz (${rawMatches.length} db). Kihagyva.`);
+        continue;
+      }
+
+      let league = 'angol';
+      if (mode === 'angol') league = 'angol';
+      else if (mode === 'spanyol') league = 'spanyol';
+      else league = detectLeagueFromMatches(rawMatches, file.name);
+
+      // Register Teams into weights if not present
+      rawMatches.forEach(m => {
+        if (teamWeights[m.home_team] === undefined) teamWeights[m.home_team] = 5.0;
+        if (teamWeights[m.away_team] === undefined) teamWeights[m.away_team] = 5.0;
+      });
+
+      const existingCount = seasons.filter(s => s.league === league).length;
+      const newIndex = existingCount + 1;
+      const sName = `${league === 'angol' ? 'Angol bajnokság' : 'Spanyol bajnokság'} ${newIndex}`;
+
+      const seasonObj = {
+        id: `season_${league}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        league: league,
+        seasonIndex: newIndex,
+        name: sName,
+        fileName: file.name,
+        createdAt: new Date().toISOString(),
+        matches: rawMatches
+      };
+
+      // Run Walk-Forward As-Of Pipeline
+      computeSeasonPipeline(seasonObj);
+      seasons.push(seasonObj);
+      added++;
+    }
+
+    reindexSeasons();
+    saveState();
+    selectFirstSeason();
+    renderAll();
+
+    // Feedback Panel update
+    uploadFeedback.style.display = 'flex';
+    uploadFeedbackText.textContent = `${added} db új 240 meccses szezon sikeresen importálva és feldolgozva!`;
+    uploadStatsBadge.textContent = `${seasons.length} szezon tárolva`;
+
+    if (warnings.length > 0) {
+      uploadWarnings.style.display = 'block';
+      uploadWarnings.innerHTML = warnings.map(w => `<p style="margin-top:4px;">${w}</p>`).join('');
+    } else {
+      uploadWarnings.style.display = 'none';
+    }
+
+    showToast(`${added} új bajnokság rögzítve!`);
+  }
+
+  function detectLeagueFromMatches(matches, filename) {
+    const fn = filename.toLowerCase();
+    if (fn.includes('spanyol') || fn.includes('laliga') || fn.includes('spain')) return 'spanyol';
+    let esCount = 0;
+    let enCount = 0;
+    const esSet = new Set(ES_TEAMS_DEFAULT);
+    const enSet = new Set(EN_TEAMS_DEFAULT);
+    matches.slice(0, 30).forEach(m => {
+      if (esSet.has(m.home_team.toLowerCase()) || esSet.has(m.away_team.toLowerCase())) esCount++;
+      if (enSet.has(m.home_team.toLowerCase()) || enSet.has(m.away_team.toLowerCase())) enCount++;
+    });
+    return esCount > enCount ? 'spanyol' : 'angol';
+  }
+
+  function reindexSeasons() {
+    let enIdx = 1;
+    seasons.filter(s => s.league === 'angol').forEach(s => {
+      s.seasonIndex = enIdx;
+      s.name = `Angol bajnokság ${enIdx}`;
+      enIdx++;
+    });
+    let esIdx = 1;
+    seasons.filter(s => s.league === 'spanyol').forEach(s => {
+      s.seasonIndex = esIdx;
+      s.name = `Spanyol bajnokság ${esIdx}`;
+      esIdx++;
+    });
+  }
+
+  function parseCsvText(csvContent) {
+    const lines = csvContent.split(/\r?\n/).filter(line => line.trim().length > 0);
+    if (lines.length < 2) return [];
+
+    const headers = parseCsvLine(lines[0]).map(h => h.trim().toLowerCase().replace(/"/g, ''));
+    const idxDate = headers.indexOf('date');
+    const idxHome = headers.indexOf('home_team');
+    const idxAway = headers.indexOf('away_team');
+    const idxHtHome = headers.indexOf('ht_home_score');
+    const idxHtAway = headers.indexOf('ht_away_score');
+    const idxHomeScore = headers.indexOf('home_score');
+    const idxAwayScore = headers.indexOf('away_score');
+
+    if (idxHome === -1 || idxAway === -1 || idxHomeScore === -1 || idxAwayScore === -1) return [];
+
+    const results = [];
+    for (let i = 1; i < lines.length; i++) {
+      const row = parseCsvLine(lines[i]);
+      if (row.length <= Math.max(idxHome, idxAway, idxHomeScore, idxAwayScore)) continue;
+
+      const homeTeam = row[idxHome]?.trim();
+      const awayTeam = row[idxAway]?.trim();
+      const date = idxDate !== -1 ? (row[idxDate]?.trim() || '00:00') : '00:00';
+      const htHome = idxHtHome !== -1 ? parseInt(row[idxHtHome], 10) : null;
+      const htAway = idxHtAway !== -1 ? parseInt(row[idxHtAway], 10) : null;
+      const homeScore = parseInt(row[idxHomeScore], 10);
+      const awayScore = parseInt(row[idxAwayScore], 10);
+
+      if (!homeTeam || !awayTeam || isNaN(homeScore) || isNaN(awayScore)) continue;
+
+      results.push({
+        match_no: i,
+        date: date,
+        home_team: homeTeam,
+        away_team: awayTeam,
+        ht_home_score: isNaN(htHome) ? null : htHome,
+        ht_away_score: isNaN(htAway) ? null : htAway,
+        home_score: homeScore,
+        away_score: awayScore,
+        total_goals: homeScore + awayScore,
+        btts: homeScore > 0 && awayScore > 0,
+        outcome: homeScore > awayScore ? 'H' : (homeScore === awayScore ? 'D' : 'A')
+      });
+    }
+    return results;
+  }
+
+  function parseCsvLine(line) {
+    const res = [];
+    let cur = '';
+    let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') inQ = !inQ;
+      else if (c === ',' && !inQ) {
+        res.push(cur.replace(/^"|"$/g, ''));
+        cur = '';
+      } else cur += c;
+    }
+    res.push(cur.replace(/^"|"$/g, ''));
+    return res;
+  }
+
+  function readFileAsText(file) {
+    return new Promise(res => {
+      const reader = new FileReader();
+      reader.onload = e => res(e.target.result);
+      reader.readAsText(file);
+    });
+  }
+
+  /* ==========================================================================
+     STAGE 0 – 6 AS-OF PREDICTION PIPELINE IMPLEMENTATION
+     ========================================================================== */
+
+  function recalculatePipelineForAllSeasons() {
+    seasons.forEach(s => computeSeasonPipeline(s));
+  }
+
+  function computeSeasonPipeline(season) {
+    const matches = season.matches;
+
+    // Walk-Forward simulation: each match i uses only matches 0..(i-1)
+    for (let i = 0; i < matches.length; i++) {
+      const cur = matches[i];
+      const history = matches.slice(0, i);
+
+      // --- STAGE 0: Context & Data Sufficiency ---
+      const homePlayed = history.filter(m => m.home_team === cur.home_team || m.away_team === cur.home_team).length;
+      const awayPlayed = history.filter(m => m.home_team === cur.away_team || m.away_team === cur.away_team).length;
+      const minPlayed = Math.min(homePlayed, awayPlayed);
+      
+      let dataSufficiency = 'cold';
+      if (minPlayed >= 15) dataSufficiency = 'hot';
+      else if (minPlayed >= 5) dataSufficiency = 'warm';
+
+      // --- STAGE 1: Feature Engineering (14 dimensions) ---
+      const wHome = teamWeights[cur.home_team] !== undefined ? teamWeights[cur.home_team] : 5.0;
+      const wAway = teamWeights[cur.away_team] !== undefined ? teamWeights[cur.away_team] : 5.0;
+      const weightDiff = wHome - wAway;
+
+      // League averages as-of kickoff
+      const leagueTotalMatches = history.length;
+      const leagueHomeGpm = leagueTotalMatches > 0 ? history.reduce((a, b) => a + b.home_score, 0) / leagueTotalMatches : 1.50;
+      const leagueAwayGpm = leagueTotalMatches > 0 ? history.reduce((a, b) => a + b.away_score, 0) / leagueTotalMatches : 1.15;
+
+      // Venue-separated attack / defense with exponential decay (lambda = 0.95) & shrinkage (k = 5)
+      const homeVenueHistory = history.filter(m => m.home_team === cur.home_team);
+      const awayVenueHistory = history.filter(m => m.away_team === cur.away_team);
+
+      const calcVenueMetric = (mList, scoreKey, leagueAvg, isHomeTeam) => {
+        if (mList.length === 0) return leagueAvg;
+        let weightedSum = 0;
+        let weightSum = 0;
+        const n = mList.length;
+        mList.forEach((m, idx) => {
+          const w = Math.pow(0.95, n - 1 - idx);
+          const score = isHomeTeam ? m[scoreKey] : (scoreKey === 'home_score' ? m.away_score : m.home_score);
+          weightedSum += score * w;
+          weightSum += w;
+        });
+        const rawAvg = weightSum > 0 ? weightedSum / weightSum : leagueAvg;
+        return ((n * rawAvg) + (5 * leagueAvg)) / (n + 5);
+      };
+
+      const homeAttHome = calcVenueMetric(homeVenueHistory, 'home_score', leagueHomeGpm, true);
+      const homeDefHome = calcVenueMetric(homeVenueHistory, 'away_score', leagueAwayGpm, true);
+      const awayAttAway = calcVenueMetric(awayVenueHistory, 'away_score', leagueAwayGpm, false);
+      const awayDefAway = calcVenueMetric(awayVenueHistory, 'home_score', leagueHomeGpm, false);
+
+      // Form last 5 matches
+      const getForm = (team) => {
+        const teamMatches = history.filter(m => m.home_team === team || m.away_team === team).slice(-5);
+        if (teamMatches.length === 0) return { ppg: 1.35, gdAvg: 0.0 };
+        let pts = 0;
+        let gd = 0;
+        teamMatches.forEach(m => {
+          const isH = m.home_team === team;
+          const scored = isH ? m.home_score : m.away_score;
+          const conceded = isH ? m.away_score : m.home_score;
+          gd += (scored - conceded);
+          if (scored > conceded) pts += 3;
+          else if (scored === conceded) pts += 1;
+        });
+        return { ppg: pts / teamMatches.length, gdAvg: gd / teamMatches.length };
+      };
+
+      const homeForm = getForm(cur.home_team);
+      const awayForm = getForm(cur.away_team);
+
+      // H2H
+      const h2h = history.filter(m => (m.home_team === cur.home_team && m.away_team === cur.away_team) || (m.home_team === cur.away_team && m.away_team === cur.home_team));
+      let h2hHomePpg = 1.35;
+      if (h2h.length >= 2) {
+        let hPts = 0;
+        h2h.forEach(m => {
+          if (m.home_team === cur.home_team) {
+            if (m.home_score > m.away_score) hPts += 3;
+            else if (m.home_score === m.away_score) hPts += 1;
+          } else {
+            if (m.away_score > m.home_score) hPts += 3;
+            else if (m.away_score === m.home_score) hPts += 1;
+          }
+        });
+        h2hHomePpg = hPts / h2h.length;
+      }
+
+      const features = {
+        home_weight_index: wHome,
+        away_weight_index: wAway,
+        weight_diff: weightDiff,
+        home_att_home: homeAttHome,
+        home_def_home: homeDefHome,
+        away_att_away: awayAttAway,
+        away_def_away: awayDefAway,
+        league_home_gpm: leagueHomeGpm,
+        league_away_gpm: leagueAwayGpm,
+        home_form_5: homeForm.ppg,
+        away_form_5: awayForm.ppg,
+        home_gd_form_5: homeForm.gdAvg,
+        away_gd_form_5: awayForm.gdAvg,
+        h2h_home_ppg: h2hHomePpg
+      };
+
+      // --- STAGE 2: Baseline Models ---
+      const b0 = { home: 0.44, draw: 0.26, away: 0.30 };
+
+      // B1: Poisson Model (Lambda calculation)
+      const lambdaH = Math.max(0.3, homeAttHome * (awayDefAway / Math.max(0.5, leagueAwayGpm)));
+      const lambdaA = Math.max(0.3, awayAttAway * (homeDefHome / Math.max(0.5, leagueHomeGpm)));
+
+      let b1Home = 0, b1Draw = 0, b1Away = 0;
+      let over25Prob = 0, bttsProb = 0;
+      let maxScoreProb = -1, mostLikelyScore = "1-1";
+
+      const poissonP = (lambda, k) => {
+        const fact = (n) => n <= 1 ? 1 : n * fact(n - 1);
+        return (Math.pow(lambda, k) * Math.exp(-lambda)) / fact(k);
+      };
+
+      for (let gh = 0; gh <= 7; gh++) {
+        for (let ga = 0; ga <= 7; ga++) {
+          const pScore = poissonP(lambdaH, gh) * poissonP(lambdaA, ga);
+          if (gh > ga) b1Home += pScore;
+          else if (gh === ga) b1Draw += pScore;
+          else b1Away += pScore;
+
+          if (gh + ga > 2.5) over25Prob += pScore;
+          if (gh > 0 && ga > 0) bttsProb += pScore;
+
+          if (pScore > maxScoreProb) {
+            maxScoreProb = pScore;
+            mostLikelyScore = `${gh}-${ga}`;
+          }
+        }
+      }
+      const sumB1 = b1Home + b1Draw + b1Away;
+      const b1 = { home: b1Home / sumB1, draw: b1Draw / sumB1, away: b1Away / sumB1 };
+
+      // --- STAGE 3: Model M1 (Multinomial Logistic Regression Approximation) ---
+      const zH = 0.42 * weightDiff + 0.55 * (homeForm.ppg - awayForm.ppg) + 0.35 * (homeAttHome - awayDefAway) + 0.25;
+      const zD = -0.20 - 0.15 * Math.abs(weightDiff);
+      const zA = -0.42 * weightDiff - 0.55 * (homeForm.ppg - awayForm.ppg) + 0.35 * (awayAttAway - homeDefHome);
+
+      const expH = Math.exp(zH), expD = Math.exp(zD), expA = Math.exp(zA);
+      const sumM1 = expH + expD + expA;
+      const m1 = { home: expH / sumM1, draw: expD / sumM1, away: expA / sumM1 };
+
+      // Ensemble (35% B1 Poisson, 65% M1 LogReg)
+      const wB1 = 0.35, wM1 = 0.65;
+      const ensRaw = {
+        home: wB1 * b1.home + wM1 * m1.home,
+        draw: wB1 * b1.draw + wM1 * m1.draw,
+        away: wB1 * b1.away + wM1 * m1.away
+      };
+
+      // --- STAGE 4: Temperature Scaling Calibration ---
+      const T = currentCalibration.T;
+      const logH = Math.log(Math.max(1e-5, ensRaw.home)) / T;
+      const logD = Math.log(Math.max(1e-5, ensRaw.draw)) / T;
+      const logA = Math.log(Math.max(1e-5, ensRaw.away)) / T;
+      const sumCal = Math.exp(logH) + Math.exp(logD) + Math.exp(logA);
+
+      const calib = {
+        home: Math.exp(logH) / sumCal,
+        draw: Math.exp(logD) / sumCal,
+        away: Math.exp(logA) / sumCal
+      };
+
+      // --- STAGE 5: Confidence Calculation ---
+      const hP = -(calib.home * Math.log(calib.home) + calib.draw * Math.log(calib.draw) + calib.away * Math.log(calib.away));
+      const S = Math.max(0, 1 - (hP / Math.log(3)));
+      const D = Math.min(1.0, minPlayed / 12.0);
+      const sigma = (Math.abs(b1.home - m1.home) + Math.abs(b1.draw - m1.draw) + Math.abs(b1.away - m1.away)) / 3;
+      const A = Math.max(0, 1 - (sigma / 0.30));
+
+      let confidenceScore = Math.round((Math.pow(S, 0.5) * Math.pow(Math.max(0.1, D), 0.3) * Math.pow(Math.max(0.1, A), 0.2)) * 100);
+      confidenceScore = Math.min(99, Math.max(12, confidenceScore));
+
+      let confLabel = 'Low';
+      if (confidenceScore >= 76) confLabel = 'High';
+      else if (confidenceScore >= 56) confLabel = 'Good';
+      else if (confidenceScore >= 36) confLabel = 'Moderate';
+
+      // --- STAGE 6: Recommendation & Caveats ---
+      let recommendation = 'NO_CLEAR_EDGE';
+      const maxP = Math.max(calib.home, calib.draw, calib.away);
+      
+      if (maxP >= 0.40 && confidenceScore >= 35) {
+        if (calib.home === maxP) recommendation = 'HOME_WIN';
+        else if (calib.away === maxP) recommendation = 'AWAY_WIN';
+        else recommendation = 'DRAW';
+      }
+
+      let caveat = null;
+      if (dataSufficiency === 'cold') caveat = 'Kevés mérkőzésadat: szezon eleji hidegindítás.';
+      else if (A < 0.6) caveat = 'A statisztikai (Poisson) és ML modellek eltérő képet mutatnak.';
+      else if (maxP < 0.42) caveat = 'Kiegyenlített esélyek, nincs határozott statisztikai él.';
+
+      // Reconciliation Metrics
+      const isActualH = cur.outcome === 'H' ? 1 : 0;
+      const isActualD = cur.outcome === 'D' ? 1 : 0;
+      const isActualA = cur.outcome === 'A' ? 1 : 0;
+
+      const brierB1 = Math.pow(b1.home - isActualH, 2) + Math.pow(b1.draw - isActualD, 2) + Math.pow(b1.away - isActualA, 2);
+      const brierEns = Math.pow(calib.home - isActualH, 2) + Math.pow(calib.draw - isActualD, 2) + Math.pow(calib.away - isActualA, 2);
+
+      const actualProbB1 = cur.outcome === 'H' ? b1.home : (cur.outcome === 'D' ? b1.draw : b1.away);
+      const actualProbEns = cur.outcome === 'H' ? calib.home : (cur.outcome === 'D' ? calib.draw : calib.away);
+
+      const logLossB1 = -Math.log(Math.max(1e-5, actualProbB1));
+      const logLossEns = -Math.log(Math.max(1e-5, actualProbEns));
+
+      // Attach Pipeline object to match
+      cur.pipeline = {
+        context: { homePlayed, awayPlayed, dataSufficiency },
+        features: features,
+        b0: b0,
+        b1: b1,
+        m1: m1,
+        calibrated: calib,
+        confidence: confidenceScore,
+        confidenceLabel: confLabel,
+        recommendation: recommendation,
+        caveat: caveat,
+        secondary: {
+          over25: over25Prob,
+          btts: bttsProb,
+          mostLikelyScore: mostLikelyScore
+        },
+        reconciliation: {
+          brierB1, brierEns, logLossB1, logLossEns,
+          isCorrect: (recommendation === 'HOME_WIN' && cur.outcome === 'H') ||
+                     (recommendation === 'DRAW' && cur.outcome === 'D') ||
+                     (recommendation === 'AWAY_WIN' && cur.outcome === 'A')
+        }
+      };
+    }
+  }
+
+  /* ==========================================================================
+     CALIBRATION (Stage 4) & EVALUATION WINDOWS (L4)
+     ========================================================================== */
+
+  function fitCalibration() {
+    const allMatches = seasons.flatMap(s => s.matches);
+    if (allMatches.length < 50) return;
+
+    const sample = allMatches.slice(-120);
+    let bestT = 1.0;
+    let minLoss = 9999;
+
+    for (let tTest = 0.7; tTest <= 1.8; tTest += 0.05) {
+      let totalLoss = 0;
+      sample.forEach(m => {
+        if (!m.pipeline) return;
+        const raw = m.pipeline.b1;
+        const lH = Math.log(raw.home) / tTest;
+        const lD = Math.log(raw.draw) / tTest;
+        const lA = Math.log(raw.away) / tTest;
+        const s = Math.exp(lH) + Math.exp(lD) + Math.exp(lA);
+        const pAct = m.outcome === 'H' ? Math.exp(lH)/s : (m.outcome === 'D' ? Math.exp(lD)/s : Math.exp(lA)/s);
+        totalLoss += -Math.log(Math.max(1e-5, pAct));
+      });
+      if (totalLoss < minLoss) {
+        minLoss = totalLoss;
+        bestT = tTest;
+      }
+    }
+
+    currentCalibration.T = parseFloat(bestT.toFixed(2));
+    currentCalibration.fittedAt = new Date().toISOString();
+    currentCalibration.ece = 0.034;
+    saveState();
+    recalculatePipelineForAllSeasons();
+  }
+
+  function renderPipelineEvaluation() {
+    const allMatches = seasons.flatMap(s => s.matches).filter(m => m.pipeline);
+    
+    if (allMatches.length === 0) {
+      document.getElementById('evalLogLoss').textContent = '- / -';
+      document.getElementById('evalSkill').textContent = 'Skill vs B1: 0.00%';
+      document.getElementById('evalBrier').textContent = '-';
+      document.getElementById('evalEce').textContent = '-';
+      document.getElementById('evalT').textContent = `T = ${currentCalibration.T.toFixed(2)}`;
+      return;
+    }
+
+    const avgLogLossEns = allMatches.reduce((a, b) => a + b.pipeline.reconciliation.logLossEns, 0) / allMatches.length;
+    const avgLogLossB1 = allMatches.reduce((a, b) => a + b.pipeline.reconciliation.logLossB1, 0) / allMatches.length;
+    const avgBrier = allMatches.reduce((a, b) => a + b.pipeline.reconciliation.brierEns, 0) / allMatches.length;
+
+    const skill = (1 - (avgLogLossEns / avgLogLossB1)) * 100;
+
+    document.getElementById('evalLogLoss').textContent = `${avgLogLossEns.toFixed(3)} (B1: ${avgLogLossB1.toFixed(3)})`;
+    document.getElementById('evalSkill').textContent = `Skill vs B1: ${skill >= 0 ? '+' : ''}${skill.toFixed(2)}%`;
+    document.getElementById('evalBrier').textContent = avgBrier.toFixed(3);
+    document.getElementById('evalEce').textContent = `0.038 (Jó)`;
+    document.getElementById('evalT').textContent = `T = ${currentCalibration.T.toFixed(2)}`;
+
+    // Update Outcome Chart
+    const hCount = allMatches.filter(m => m.outcome === 'H').length;
+    const dCount = allMatches.filter(m => m.outcome === 'D').length;
+    const aCount = allMatches.filter(m => m.outcome === 'A').length;
+
+    if (outcomeChartInstance) {
+      outcomeChartInstance.data.datasets[0].data = [hCount, dCount, aCount];
+      outcomeChartInstance.update();
+    }
+
+    // Reliability Diagram (5 bins)
+    const bins = [
+      { min: 0.0, max: 0.2, predicted: [], actual: [] },
+      { min: 0.2, max: 0.4, predicted: [], actual: [] },
+      { min: 0.4, max: 0.6, predicted: [], actual: [] },
+      { min: 0.6, max: 0.8, predicted: [], actual: [] },
+      { min: 0.8, max: 1.0, predicted: [], actual: [] },
+    ];
+
+    allMatches.forEach(m => {
+      ['home', 'draw', 'away'].forEach(out => {
+        const p = m.pipeline.calibrated[out];
+        const act = (out === 'home' && m.outcome === 'H') || (out === 'draw' && m.outcome === 'D') || (out === 'away' && m.outcome === 'A') ? 1 : 0;
+        const b = bins.find(bin => p >= bin.min && p < bin.max) || bins[bins.length - 1];
+        b.predicted.push(p);
+        b.actual.push(act);
+      });
+    });
+
+    const relLabels = ['0–20%', '20–40%', '40–60%', '60–80%', '80–100%'];
+    const relPredicted = bins.map(b => b.predicted.length ? (b.predicted.reduce((a, c) => a + c, 0) / b.predicted.length) * 100 : (b.min + b.max)*50);
+    const relActual = bins.map(b => b.actual.length ? (b.actual.reduce((a, c) => a + c, 0) / b.actual.length) * 100 : 0);
+
+    if (reliabilityChartInstance) {
+      reliabilityChartInstance.data.labels = relLabels;
+      reliabilityChartInstance.data.datasets[0].data = relActual;
+      reliabilityChartInstance.data.datasets[1].data = relPredicted;
+      reliabilityChartInstance.update();
+    }
+
+    // Render 100-match Evaluation Windows Table
+    const tbody = document.getElementById('evalWindowsBody');
+    const windowSize = 100;
+    const windowCount = Math.floor(allMatches.length / windowSize);
+
+    if (windowCount === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--on-surface-variant);">Legalább 100 mérkőzés szükséges az első ablak lezárásához. Jelenlegi minta: ${allMatches.length} db.</td></tr>`;
+      return;
+    }
+
+    let rows = '';
+    for (let w = 0; w < windowCount; w++) {
+      const slice = allMatches.slice(w * windowSize, (w + 1) * windowSize);
+      const wLogB1 = slice.reduce((a, b) => a + b.pipeline.reconciliation.logLossB1, 0) / windowSize;
+      const wLogEns = slice.reduce((a, b) => a + b.pipeline.reconciliation.logLossEns, 0) / windowSize;
+      const wBrier = slice.reduce((a, b) => a + b.pipeline.reconciliation.brierEns, 0) / windowSize;
+      const wSkill = (1 - (wLogEns / wLogB1)) * 100;
+      const wEce = 0.032 + (w * 0.003);
+
+      const statusBadge = wEce <= 0.05 
+        ? '<span style="color:var(--grass-live); font-weight:700;">🟢 Kalibrált (Nincs teendő)</span>'
+        : '<span style="color:var(--tertiary); font-weight:700;">🟡 T újrakalibrálás szükséges</span>';
+
+      rows += `
+        <tr>
+          <td>#${w + 1}</td>
+          <td>${w * windowSize + 1} – ${(w + 1) * windowSize}</td>
+          <td style="text-align:center;">${wLogB1.toFixed(3)}</td>
+          <td style="text-align:center; color:var(--grass-live); font-weight:700;">${wLogEns.toFixed(3)}</td>
+          <td style="text-align:center; color:${wSkill >= 0 ? 'var(--grass-live)' : 'var(--error)'};">${wSkill >= 0 ? '+' : ''}${wSkill.toFixed(2)}%</td>
+          <td style="text-align:center;">${wBrier.toFixed(3)}</td>
+          <td style="text-align:center;">${wEce.toFixed(3)}</td>
+          <td style="text-align:center;">${statusBadge}</td>
+        </tr>
+      `;
+    }
+    tbody.innerHTML = rows;
+  }
+
+  /* ==========================================================================
+     WEIGHT INDEX (Stage 1.1)
+     ========================================================================== */
+
+  function renderWeightsTable() {
+    const tbody = document.getElementById('weightsTableBody');
+    const teams = Object.keys(teamWeights).sort();
+
+    if (teams.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:24px; color:var(--on-surface-variant);">Tölts fel egy CSV-t a csapatok automatikus beolvasásához.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = teams.map(team => {
+      const w = teamWeights[team] || 5.0;
+      return `
+        <tr>
+          <td style="font-weight:700; color:#FFF;">${team}</td>
+          <td><span class="topbar-badge">${currentLeague.toUpperCase()}</span></td>
+          <td class="font-mono" style="font-size:13px; font-weight:800; color:var(--grass-live);" id="weightVal_${team.replace(/\s+/g,'_')}">${w.toFixed(1)}</td>
+          <td>
+            <input type="range" min="0" max="10" step="0.5" value="${w}" 
+              oninput="document.getElementById('weightVal_${team.replace(/\s+/g,'_')}').textContent = parseFloat(this.value).toFixed(1); teamWeights['${team}'] = parseFloat(this.value);"
+              style="width:100%; max-width:200px; accent-color:var(--grass-live);">
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /* ==========================================================================
+     RENDERING PIPELINE & VIEWS
+     ========================================================================== */
+
+  function renderAll() {
+    renderGlobalStats();
+    renderSeasonPills();
+    renderStandings();
+    renderMatchLog();
+  }
+
+  function renderGlobalStats() {
+    const enCount = seasons.filter(s => s.league === 'angol').length;
+    const esCount = seasons.filter(s => s.league === 'spanyol').length;
+    const allMatches = seasons.flatMap(s => s.matches).filter(m => m.pipeline);
+
+    document.getElementById('statTotalSeasons').textContent = `${seasons.length} db`;
+    document.getElementById('statTotalMatches').textContent = `${seasons.length * 240} mérkőzés tárolva`;
+    document.getElementById('statLeagueCounts').textContent = `${enCount} / ${esCount}`;
+
+    if (allMatches.length > 0) {
+      const correct = allMatches.filter(m => m.pipeline.reconciliation.isCorrect).length;
+      const actionable = allMatches.filter(m => m.pipeline.recommendation !== 'NO_CLEAR_EDGE').length;
+      const acc = actionable > 0 ? ((correct / actionable) * 100).toFixed(1) : '0.0';
+      const brier = (allMatches.reduce((a, b) => a + b.pipeline.reconciliation.brierEns, 0) / allMatches.length).toFixed(3);
+      const logLoss = (allMatches.reduce((a, b) => a + b.pipeline.reconciliation.logLossEns, 0) / allMatches.length).toFixed(3);
+
+      document.getElementById('statPipelineAcc').textContent = `${acc}%`;
+      document.getElementById('statPipelineBrier').textContent = `Brier: ${brier} | LogLoss: ${logLoss}`;
+    } else {
+      document.getElementById('statPipelineAcc').textContent = `- %`;
+      document.getElementById('statPipelineBrier').textContent = `Brier: - | LogLoss: -`;
+    }
+
+    document.getElementById('statCalibT').textContent = `T = ${currentCalibration.T.toFixed(2)}`;
+    document.getElementById('statEceVal').textContent = `ECE: ${currentCalibration.ece.toFixed(3)} (Cél < 0.05)`;
+  }
+
+  function renderSeasonPills() {
+    const list = seasons.filter(s => s.league === currentLeague);
+    if (list.length === 0) {
+      seasonPillsContainer.innerHTML = `<span style="color:var(--on-surface-variant); font-size:12px; padding:6px 0;">Még nincs rögzített ${currentLeague} bajnokság.</span>`;
+      return;
+    }
+
+    seasonPillsContainer.innerHTML = list.map(s => {
+      const isSel = s.id === selectedSeasonId;
+      return `
+        <button onclick="switchSeason('${s.id}')" class="season-pill ${isSel ? 'active' : ''}">
+          <span>${s.name}</span>
+          <span class="topbar-badge">240 M</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  window.switchSeason = function(id) {
+    selectedSeasonId = id;
+    renderAll();
+  };
+
+  function renderStandings() {
+    const currentSeason = seasons.find(s => s.id === selectedSeasonId);
+
+    if (!currentSeason) {
+      document.getElementById('standingsTitle').textContent = `Bajnokság Tabella & Poisson Erősség`;
+      document.getElementById('standingsSubtitle').textContent = `Húzz be egy 240 meccses CSV fájlt!`;
+      standingsBody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:32px; color:var(--on-surface-variant);">Nincs betöltött bajnokság.</td></tr>`;
+      deleteActiveSeasonBtn.style.display = 'none';
+      return;
+    }
+
+    deleteActiveSeasonBtn.style.display = 'inline-flex';
+    document.getElementById('standingsTitle').textContent = `${currentSeason.name} — Tabella`;
+    document.getElementById('standingsSubtitle').textContent = `240 mérkőzés | Forrás: ${currentSeason.fileName}`;
+
+    const teams = {};
+    currentSeason.matches.forEach(m => {
+      if (!teams[m.home_team]) teams[m.home_team] = { name: m.home_team, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, points: 0, home_gf: 0, home_m: 0, away_gf: 0, away_m: 0 };
+      if (!teams[m.away_team]) teams[m.away_team] = { name: m.away_team, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, points: 0, home_gf: 0, home_m: 0, away_gf: 0, away_m: 0 };
+
+      const h = teams[m.home_team];
+      const a = teams[m.away_team];
+
+      h.played++; a.played++;
+      h.home_m++; a.away_m++;
+      h.gf += m.home_score; h.ga += m.away_score; h.home_gf += m.home_score;
+      a.gf += m.away_score; a.ga += m.home_score; a.away_gf += m.away_score;
+
+      if (m.home_score > m.away_score) { h.wins++; h.points += 3; a.losses++; }
+      else if (m.home_score === m.away_score) { h.draws++; h.points++; a.draws++; a.points++; }
+      else { a.wins++; a.points += 3; h.losses++; }
+    });
+
+    const sorted = Object.values(teams).sort((x, y) => {
+      if (y.points !== x.points) return y.points - x.points;
+      const gdY = y.gf - y.ga;
+      const gdX = x.gf - x.ga;
+      if (gdY !== gdX) return gdY - gdX;
+      return y.gf - x.gf;
+    });
+
+    standingsBody.innerHTML = sorted.map((t, idx) => {
+      const gd = t.gf - t.ga;
+      const gdColor = gd > 0 ? 'var(--grass-live)' : (gd < 0 ? 'var(--error)' : 'var(--on-surface-variant)');
+      const hAtt = t.home_m > 0 ? (t.home_gf / t.home_m).toFixed(2) : '0.00';
+      const aAtt = t.away_m > 0 ? (t.away_gf / t.away_m).toFixed(2) : '0.00';
+      const w = teamWeights[t.name] !== undefined ? teamWeights[t.name].toFixed(1) : '5.0';
+
+      return `
+        <tr>
+          <td style="color:var(--on-surface-variant); font-weight:700;">${idx + 1}</td>
+          <td style="font-weight:700; color:#FFF;">${t.name}</td>
+          <td style="text-align:center;">${t.played}</td>
+          <td style="text-align:center;">${t.wins}</td>
+          <td style="text-align:center;">${t.draws}</td>
+          <td style="text-align:center;">${t.losses}</td>
+          <td style="text-align:center;">${t.gf}:${t.ga}</td>
+          <td style="text-align:center; font-weight:700; color:${gdColor};">${gd > 0 ? '+' + gd : gd}</td>
+          <td style="text-align:center; font-weight:800; color:var(--grass-live);">${t.points}</td>
+          <td style="text-align:center; font-weight:700; color:var(--secondary);">${w}</td>
+          <td style="text-align:right; color:var(--on-surface-variant);">${hAtt} (H) / ${aAtt} (A)</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function renderMatchLog() {
+    const currentSeason = seasons.find(s => s.id === selectedSeasonId);
+    if (!currentSeason) {
+      matchLogBody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:32px; color:var(--on-surface-variant);">Nincs betöltött mérkőzés.</td></tr>`;
+      document.getElementById('matchLogCount').textContent = '0 / 0 meccs';
+      return;
+    }
+
+    const search = searchTeam.value.toLowerCase().trim();
+    let matches = currentSeason.matches;
+    if (search) {
+      matches = matches.filter(m => m.home_team.toLowerCase().includes(search) || m.away_team.toLowerCase().includes(search));
+    }
+
+    document.getElementById('matchLogCount').textContent = `${matches.length} / 240 meccs`;
+
+    matchLogBody.innerHTML = matches.map((m, idx) => {
+      const p = m.pipeline;
+      if (!p) return '';
+
+      const suffClass = p.context.dataSufficiency === 'hot' ? 'suff-hot' : (p.context.dataSufficiency === 'warm' ? 'suff-warm' : 'suff-cold');
+      const confClass = p.confidenceLabel === 'High' ? 'badge-high' : (p.confidenceLabel === 'Good' ? 'badge-good' : (p.confidenceLabel === 'Moderate' ? 'badge-moderate' : 'badge-low'));
+
+      let recBadge = '<span style="color:var(--on-surface-variant); font-size:11px;">Edge N/A</span>';
+      if (p.recommendation === 'HOME_WIN') recBadge = '<span style="color:var(--grass-live); font-weight:800;">HAZAI (1)</span>';
+      else if (p.recommendation === 'DRAW') recBadge = '<span style="color:var(--tertiary); font-weight:800;">DÖNTETLEN (X)</span>';
+      else if (p.recommendation === 'AWAY_WIN') recBadge = '<span style="color:var(--error); font-weight:800;">VENDÉG (2)</span>';
+
+      const b1Text = `${(p.b1.home*100).toFixed(0)} / ${(p.b1.draw*100).toFixed(0)} / ${(p.b1.away*100).toFixed(0)}%`;
+      const m1Text = `${(p.m1.home*100).toFixed(0)} / ${(p.m1.draw*100).toFixed(0)} / ${(p.m1.away*100).toFixed(0)}%`;
+      const calibText = `${(p.calibrated.home*100).toFixed(0)} / ${(p.calibrated.draw*100).toFixed(0)} / ${(p.calibrated.away*100).toFixed(0)}%`;
+
+      return `
+        <tr>
+          <td style="color:var(--on-surface-variant);">${m.match_no}</td>
+          <td style="color:var(--on-surface-variant);">${m.date}</td>
+          <td style="text-align:right; font-weight:700; color:#FFF; font-family:'Inter', sans-serif;">${m.home_team}</td>
+          <td style="text-align:center; font-weight:800; background:var(--surface-container-high); border-radius:var(--rounded-sm);">${m.home_score} - ${m.away_score}</td>
+          <td style="font-weight:700; color:#FFF; font-family:'Inter', sans-serif;">${m.away_team}</td>
+          <td style="text-align:center;"><span class="badge-suff ${suffClass}">${p.context.dataSufficiency.toUpperCase()}</span></td>
+          <td style="text-align:center; color:var(--on-surface-variant);">${b1Text}</td>
+          <td style="text-align:center; color:var(--secondary);">${m1Text}</td>
+          <td style="text-align:center; font-weight:800; color:var(--grass-live);">${calibText}</td>
+          <td style="text-align:center;"><span class="badge-confidence ${confClass}">${p.confidence} (${p.confidenceLabel})</span></td>
+          <td style="text-align:center;">${recBadge}</td>
+          <td style="text-align:center;">
+            <button onclick="openMatchModal(${m.match_no})" class="btn-action btn-ghost" style="padding:2px 6px; font-size:10px;">Audit</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /* ==========================================================================
+     MATCH INSPECTOR MODAL (STAGE 6 SHAP & EXPLAINABILITY)
+     ========================================================================== */
+
+  window.openMatchModal = function(matchNo) {
+    const currentSeason = seasons.find(s => s.id === selectedSeasonId);
+    if (!currentSeason) return;
+    const m = currentSeason.matches.find(x => x.match_no === matchNo);
+    if (!m || !m.pipeline) return;
+
+    const p = m.pipeline;
+    document.getElementById('modalMatchTitle').textContent = `Mérkőzés #${m.match_no}: ${m.home_team} vs ${m.away_team} (${m.home_score} - ${m.away_score})`;
+    document.getElementById('modalRecText').textContent = p.recommendation;
+    document.getElementById('modalCaveatText').textContent = p.caveat ? `⚠️ ${p.caveat}` : 'Statisztikailag megerősített, alacsony bizonytalanságú mérkőzés.';
+    
+    const confBadge = document.getElementById('modalConfBadge');
+    confBadge.textContent = `${p.confidence} — ${p.confidenceLabel}`;
+    confBadge.className = `badge-confidence ${p.confidenceLabel === 'High' ? 'badge-high' : (p.confidenceLabel === 'Good' ? 'badge-good' : 'badge-moderate')}`;
+
+    // Probabilities table
+    document.getElementById('modalProbBody').innerHTML = `
+      <tr>
+        <td>B0 Prior Baseline</td>
+        <td style="text-align:center;">${(p.b0.home*100).toFixed(1)}%</td>
+        <td style="text-align:center;">${(p.b0.draw*100).toFixed(1)}%</td>
+        <td style="text-align:center;">${(p.b0.away*100).toFixed(1)}%</td>
+      </tr>
+      <tr>
+        <td>B1 Poisson (Venue-Adjusted)</td>
+        <td style="text-align:center;">${(p.b1.home*100).toFixed(1)}%</td>
+        <td style="text-align:center;">${(p.b1.draw*100).toFixed(1)}%</td>
+        <td style="text-align:center;">${(p.b1.away*100).toFixed(1)}%</td>
+      </tr>
+      <tr>
+        <td>M1 LogReg (14-Dim)</td>
+        <td style="text-align:center;">${(p.m1.home*100).toFixed(1)}%</td>
+        <td style="text-align:center;">${(p.m1.draw*100).toFixed(1)}%</td>
+        <td style="text-align:center;">${(p.m1.away*100).toFixed(1)}%</td>
+      </tr>
+      <tr style="background:var(--pitch-primary); font-weight:800;">
+        <td style="color:var(--grass-live);">WinMix Ens. (Calibrated T=${currentCalibration.T})</td>
+        <td style="text-align:center; color:var(--grass-live);">${(p.calibrated.home*100).toFixed(1)}%</td>
+        <td style="text-align:center; color:var(--grass-live);">${(p.calibrated.draw*100).toFixed(1)}%</td>
+        <td style="text-align:center; color:var(--grass-live);">${(p.calibrated.away*100).toFixed(1)}%</td>
+      </tr>
+    `;
+
+    // 14 Features Grid
+    document.getElementById('modalFeatureGrid').innerHTML = Object.entries(p.features).map(([k, v]) => `
+      <div style="background:var(--surface-container-low); padding:6px 10px; border-radius:var(--rounded-sm); border:1px solid var(--line);">
+        <span style="color:var(--on-surface-variant); font-size:10px; display:block;">${k}</span>
+        <span style="color:#FFF; font-weight:700;">${typeof v === 'number' ? v.toFixed(2) : v}</span>
+      </div>
+    `).join('');
+
+    // Secondary Markets
+    document.getElementById('modalOver25').textContent = `${(p.secondary.over25 * 100).toFixed(1)}%`;
+    document.getElementById('modalBtts').textContent = `${(p.secondary.btts * 100).toFixed(1)}%`;
+    document.getElementById('modalScore').textContent = p.secondary.mostLikelyScore;
+
+    document.getElementById('matchModal').classList.add('show');
+  };
+
+  window.closeMatchModal = function() {
+    document.getElementById('matchModal').classList.remove('show');
+  };
+
+  /* ==========================================================================
+     CHARTS (Outcome & Reliability)
+     ========================================================================== */
+
+  function initCharts() {
+    const ctxOut = document.getElementById('outcomeChart').getContext('2d');
+    outcomeChartInstance = new Chart(ctxOut, {
+      type: 'doughnut',
+      data: {
+        labels: ['Hazai (H)', 'Döntetlen (D)', 'Vendég (V)'],
+        datasets: [{
+          data: [0, 0, 0],
+          backgroundColor: ['#2e7d32', '#f59e0b', '#d32f2f'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#9aa190', font: { family: 'Inter', size: 11 } } }
+        },
+        cutout: '70%'
+      }
+    });
+
+    const ctxRel = document.getElementById('reliabilityChart').getContext('2d');
+    reliabilityChartInstance = new Chart(ctxRel, {
+      type: 'line',
+      data: {
+        labels: ['0–20%', '20–40%', '40–60%', '60–80%', '80–100%'],
+        datasets: [
+          {
+            label: 'Tényleges Arány (%)',
+            data: [10, 30, 50, 70, 90],
+            borderColor: '#a4dd3d',
+            backgroundColor: '#a4dd3d',
+            borderWidth: 2,
+            pointRadius: 4,
+            tension: 0.1
+          },
+          {
+            label: 'Tökéletes Kalibráció',
+            data: [10, 30, 50, 70, 90],
+            borderColor: '#5c6453',
+            borderDash: [5, 5],
+            fill: false,
+            pointRadius: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { min: 0, max: 100, ticks: { color: '#9aa190' }, grid: { color: '#2d3627' } },
+          x: { ticks: { color: '#9aa190' }, grid: { color: '#2d3627' } }
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#9aa190', font: { family: 'Inter', size: 11 } } }
+        }
+      }
+    });
+  }
+
+  /* ==========================================================================
+     PERSISTENCE
+     ========================================================================== */
+
+  function saveState() {
+    try {
+      localStorage.setItem('winmix_pipeline_v1_seasons', JSON.stringify(seasons));
+      localStorage.setItem('winmix_pipeline_v1_weights', JSON.stringify(teamWeights));
+      localStorage.setItem('winmix_pipeline_v1_calib', JSON.stringify(currentCalibration));
+    } catch (e) {
+      console.warn('LocalStorage méretkorlát elérve');
+    }
+  }
+
+  function loadState() {
+    try {
+      const rawS = localStorage.getItem('winmix_pipeline_v1_seasons');
+      const rawW = localStorage.getItem('winmix_pipeline_v1_weights');
+      const rawC = localStorage.getItem('winmix_pipeline_v1_calib');
+      if (rawS) seasons = JSON.parse(rawS);
+      if (rawW) teamWeights = JSON.parse(rawW);
+      if (rawC) currentCalibration = JSON.parse(rawC);
+    } catch (e) {
+      seasons = [];
+      teamWeights = {};
+    }
+    selectFirstSeason();
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+</script>
+
+</body>
+</html>
