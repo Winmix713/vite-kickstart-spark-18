@@ -1,0 +1,711 @@
+<html lang="hu"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WinMix Studio — Pipeline v2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
+<body class="min-h-screen bg-[#08090b] font-['Inter'] text-zinc-400 antialiased selection:bg-lime-300/20 selection:text-lime-100" style="--brand:#bef264;--success:#34d399;--info:#38bdf8;--danger:#fb7185">
+
+<!-- SIDEBAR -->
+<aside class="fixed inset-y-0 left-0 z-40 hidden w-16 flex-col items-center justify-between border-r border-white/[0.06] bg-[#0a0b0d] py-4 md:flex">
+  <div class="flex w-full flex-col items-center gap-1">
+    <a href="#" class="mb-4 grid h-9 w-9 place-items-center rounded-lg bg-lime-300 text-sm font-semibold tracking-tighter text-[#0b0f04]">WM</a>
+
+    <a href="#" class="group relative grid h-10 w-10 place-items-center rounded-lg border border-lime-300/20 bg-lime-300/[0.08] text-lime-200">
+      <span class="absolute -left-[13px] h-5 w-[2px] rounded-full bg-lime-300"></span>
+      <iconify-icon icon="solar:database-linear" width="19"></iconify-icon>
+      <span class="pointer-events-none absolute left-12 z-50 whitespace-nowrap rounded-md border border-white/[0.08] bg-[#131417] px-2 py-1 text-xs text-zinc-200 opacity-0 shadow-lg transition group-hover:opacity-100">Adattár</span>
+    </a>
+    <a href="#" class="group relative grid h-10 w-10 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200">
+      <iconify-icon icon="solar:chart-2-linear" width="19"></iconify-icon>
+      <span class="pointer-events-none absolute left-12 z-50 whitespace-nowrap rounded-md border border-white/[0.08] bg-[#131417] px-2 py-1 text-xs text-zinc-200 opacity-0 shadow-lg transition group-hover:opacity-100">Előrejelzések</span>
+    </a>
+    <a href="#" class="group relative grid h-10 w-10 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200">
+      <iconify-icon icon="solar:users-group-rounded-linear" width="19"></iconify-icon>
+      <span class="pointer-events-none absolute left-12 z-50 whitespace-nowrap rounded-md border border-white/[0.08] bg-[#131417] px-2 py-1 text-xs text-zinc-200 opacity-0 shadow-lg transition group-hover:opacity-100">Csapatok</span>
+    </a>
+    <a href="#" class="group relative grid h-10 w-10 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200">
+      <iconify-icon icon="solar:target-linear" width="19"></iconify-icon>
+      <span class="pointer-events-none absolute left-12 z-50 whitespace-nowrap rounded-md border border-white/[0.08] bg-[#131417] px-2 py-1 text-xs text-zinc-200 opacity-0 shadow-lg transition group-hover:opacity-100">Mérkőzések</span>
+    </a>
+    <a href="#" class="group relative grid h-10 w-10 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200">
+      <iconify-icon icon="solar:clipboard-list-linear" width="19"></iconify-icon>
+      <span class="pointer-events-none absolute left-12 z-50 whitespace-nowrap rounded-md border border-white/[0.08] bg-[#131417] px-2 py-1 text-xs text-zinc-200 opacity-0 shadow-lg transition group-hover:opacity-100">Futtatások</span>
+    </a>
+    <a href="#" class="group relative grid h-10 w-10 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200">
+      <iconify-icon icon="solar:flag-linear" width="19"></iconify-icon>
+      <span class="pointer-events-none absolute left-12 z-50 whitespace-nowrap rounded-md border border-white/[0.08] bg-[#131417] px-2 py-1 text-xs text-zinc-200 opacity-0 shadow-lg transition group-hover:opacity-100">Bajnokságok</span>
+    </a>
+  </div>
+  <div class="flex flex-col items-center gap-1">
+    <a href="#" class="group relative grid h-10 w-10 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200">
+      <iconify-icon icon="solar:download-minimalistic-linear" width="19"></iconify-icon>
+      <span class="pointer-events-none absolute left-12 z-50 whitespace-nowrap rounded-md border border-white/[0.08] bg-[#131417] px-2 py-1 text-xs text-zinc-200 opacity-0 shadow-lg transition group-hover:opacity-100">Export</span>
+    </a>
+    <a href="#" class="group relative grid h-10 w-10 place-items-center rounded-lg text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-200">
+      <iconify-icon icon="solar:settings-linear" width="19"></iconify-icon>
+      <span class="pointer-events-none absolute left-12 z-50 whitespace-nowrap rounded-md border border-white/[0.08] bg-[#131417] px-2 py-1 text-xs text-zinc-200 opacity-0 shadow-lg transition group-hover:opacity-100">Beállítások</span>
+    </a>
+  </div>
+</aside>
+
+<div class="md:pl-16">
+
+  <!-- TOPBAR -->
+  <header class="sticky top-0 z-30 border-b border-white/[0.06] bg-[#08090b]/85 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-[112rem] flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div class="flex items-center gap-3">
+        <span class="text-base font-semibold tracking-tight text-white">WinMix Studio</span>
+        <span class="rounded-md border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 font-['JetBrains_Mono'] text-xs text-zinc-400">v2.0 · Part A</span>
+      </div>
+
+      <!-- global system controls -->
+      <div class="ml-auto flex items-center gap-2">
+        <div class="flex items-center gap-1 rounded-lg border border-white/[0.07] bg-white/[0.025] p-0.5">
+          <button data-seg="" class="rounded-md bg-lime-300/[0.12] px-2.5 py-1.5 text-xs font-medium text-lime-200 ring-1 ring-inset ring-lime-300/25 transition">Angol</button>
+          <button data-seg="" class="rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-500 ring-1 ring-inset ring-transparent transition hover:text-zinc-200">Spanyol</button>
+        </div>
+        <div class="flex items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.025] px-2.5 py-1.5">
+          <span class="text-xs font-medium text-zinc-500">Élő</span>
+          <button data-toggle="" aria-checked="true" class="relative h-[18px] w-8 rounded-full border border-lime-300/35 bg-lime-300/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-lime-300/30">
+            <span class="knob absolute top-[1px] left-[15px] h-3.5 w-3.5 rounded-full bg-lime-300 transition-all duration-200"></span>
+          </button>
+        </div>
+        <button class="grid h-8 w-8 place-items-center rounded-lg border border-white/[0.07] bg-white/[0.025] text-zinc-500 transition hover:border-white/15 hover:text-zinc-200">
+          <iconify-icon icon="solar:settings-linear" width="16"></iconify-icon>
+        </button>
+      </div>
+
+      <div class="hidden h-6 w-px bg-white/[0.08] lg:block"></div>
+
+      <!-- pipeline controls -->
+      <div class="flex items-center gap-2">
+        <button class="inline-flex items-center gap-2 rounded-lg bg-lime-300 px-3.5 py-2 text-[0.8125rem] font-semibold text-[#0b0f04] transition hover:bg-lime-200 focus:outline-none focus:ring-2 focus:ring-lime-300/40 active:scale-[0.98]">
+          <iconify-icon icon="solar:bolt-linear" width="16"></iconify-icon> Pipeline futtatás
+        </button>
+        <button class="grid h-8 w-8 place-items-center rounded-lg border border-white/[0.07] bg-white/[0.025] text-zinc-500 transition hover:border-rose-400/30 hover:bg-rose-400/[0.08] hover:text-rose-300">
+          <iconify-icon icon="solar:trash-bin-trash-linear" width="16"></iconify-icon>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[112rem] space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+
+    <!-- PAGE TITLE -->
+    <section class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div class="max-w-2xl">
+        <h1 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Bajnokságok &amp; szezonok központi tára</h1>
+        <p class="mt-2 text-sm leading-relaxed text-zinc-500">Minden feltöltött, ~240 mérkőzéses CSV önálló szezonként kerül rögzítésre a WinMix as-of predikciós pipeline számára.</p>
+      </div>
+      <div class="relative w-full shrink-0 lg:w-72" data-select="">
+        <p class="mb-1.5 text-xs font-medium text-zinc-500">Liga hozzárendelés</p>
+        <button class="flex w-full items-center justify-between gap-3 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-left text-sm text-zinc-200 transition hover:border-white/15 focus:outline-none focus:ring-2 focus:ring-lime-300/25">
+          <span data-label="" class="truncate">Automatikus ligafelismerés</span>
+          <iconify-icon data-chev="" icon="solar:alt-arrow-down-linear" width="16" class="shrink-0 text-zinc-500 transition-transform duration-200"></iconify-icon>
+        </button>
+        <div data-menu="" class="invisible absolute right-0 z-20 mt-2 w-full origin-top scale-95 overflow-hidden rounded-lg border border-white/[0.08] bg-[#101114] p-1 opacity-0 shadow-2xl transition-all duration-150">
+          <button data-opt="" class="w-full rounded-md px-3 py-2 text-left text-sm text-lime-200 transition hover:bg-white/[0.05]">Automatikus ligafelismerés</button>
+          <button data-opt="" class="w-full rounded-md px-3 py-2 text-left text-sm text-zinc-300 transition hover:bg-white/[0.05]">Kézi liga hozzárendelés</button>
+          <button data-opt="" class="w-full rounded-md px-3 py-2 text-left text-sm text-zinc-300 transition hover:bg-white/[0.05]">Fájlnév alapú mapping</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- L1 — PIPELINE STATUS -->
+    <section class="rounded-xl border border-white/[0.1] bg-white/[0.04] p-5 sm:p-6">
+      <div class="flex flex-wrap items-start justify-between gap-x-8 gap-y-4">
+        <div class="flex items-start gap-3">
+          <span class="mt-1.5 grid h-2.5 w-2.5 place-items-center">
+            <span class="absolute h-2.5 w-2.5 animate-ping rounded-full bg-lime-300/50"></span>
+            <span class="h-2 w-2 rounded-full bg-lime-300"></span>
+          </span>
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <h2 class="text-base font-semibold tracking-tight text-white">Pipeline fut — as-of jellemzők számítása</h2>
+              <span class="rounded-md border border-lime-300/25 bg-lime-300/[0.1] px-2 py-0.5 font-['JetBrains_Mono'] text-xs font-medium text-lime-200">4 / 7 fázis</span>
+            </div>
+            <p class="mt-1.5 text-[0.8125rem] text-zinc-500">Angol bajnokság · 17 szezon · indítva 14:02:11 · futásazonosító <span class="font-['JetBrains_Mono'] text-zinc-400">run_2f81c</span></p>
+          </div>
+        </div>
+        <div class="flex items-end gap-8">
+          <div>
+            <p class="text-xs font-medium text-zinc-500">Feldolgozva</p>
+            <p class="mt-1 font-['JetBrains_Mono'] text-2xl font-semibold tracking-tight text-white tabular-nums">1 625<span class="text-base font-normal text-zinc-600"> / 4 080</span></p>
+          </div>
+          <div>
+            <p class="text-xs font-medium text-zinc-500">Hátralévő idő</p>
+            <p class="mt-1 font-['JetBrains_Mono'] text-2xl font-semibold tracking-tight text-zinc-300 tabular-nums">00:42</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
+        <div class="h-full w-[40%] rounded-full bg-lime-300 transition-all duration-500"></div>
+      </div>
+
+      <div class="mt-5 flex gap-2 overflow-x-auto pb-1 [&amp;::-webkit-scrollbar]:hidden">
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.07] bg-white/[0.02] px-2.5 py-1.5 text-xs text-zinc-500"><iconify-icon icon="solar:check-circle-linear" width="14" class="text-emerald-400"></iconify-icon> Import</span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.07] bg-white/[0.02] px-2.5 py-1.5 text-xs text-zinc-500"><iconify-icon icon="solar:check-circle-linear" width="14" class="text-emerald-400"></iconify-icon> Validálás</span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.07] bg-white/[0.02] px-2.5 py-1.5 text-xs text-zinc-500"><iconify-icon icon="solar:check-circle-linear" width="14" class="text-emerald-400"></iconify-icon> Deduplikáció</span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-lime-300/25 bg-lime-300/[0.08] px-2.5 py-1.5 text-xs font-medium text-lime-200"><iconify-icon icon="solar:refresh-linear" width="14"></iconify-icon> As-of jellemzők</span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.06] px-2.5 py-1.5 text-xs text-zinc-600">Kalibráció</span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.06] px-2.5 py-1.5 text-xs text-zinc-600">Predikció</span>
+        <span class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.06] px-2.5 py-1.5 text-xs text-zinc-600">Audit</span>
+      </div>
+    </section>
+
+    <!-- IMPORT -->
+    <section class="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6">
+      <h2 class="text-base font-semibold tracking-tight text-white">Adatimport</h2>
+      <p class="mt-1.5 text-[0.8125rem] leading-relaxed text-zinc-500">A motor ellenőrzi a ~240 meccses teljességet, deduplikál sor- és fájlszinten, majd új szezonként rögzít.</p>
+
+      <div class="mt-5 flex flex-col items-start gap-5 rounded-lg border border-dashed border-white/15 bg-white/[0.015] p-5 transition hover:border-lime-300/35 hover:bg-lime-300/[0.02] lg:flex-row lg:items-center">
+        <div class="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-zinc-300">
+          <iconify-icon icon="solar:cloud-upload-linear" width="20"></iconify-icon>
+        </div>
+        <div class="flex-1">
+          <p class="text-[0.9375rem] font-medium text-zinc-100">Húzd ide a bajnokságok CSV fájljait, vagy tallózz</p>
+          <p class="mt-1 text-[0.8125rem] leading-relaxed text-zinc-500">Egyszerre 50–100 fájl, korlátozott worker-poollal beolvasva. Elfogadott séma: <span class="font-['JetBrains_Mono'] text-zinc-400">date, home, away, fthg, ftag</span>.</p>
+        </div>
+        <button class="inline-flex shrink-0 items-center gap-2 rounded-lg border border-white/[0.1] bg-white/[0.04] px-3.5 py-2 text-[0.8125rem] font-medium text-zinc-100 transition hover:border-lime-300/35 hover:bg-lime-300/[0.08] hover:text-lime-100 focus:outline-none focus:ring-2 focus:ring-lime-300/25">
+          <iconify-icon icon="solar:folder-open-linear" width="16"></iconify-icon> Fájlok tallózása
+        </button>
+      </div>
+
+      <div class="mt-6 grid gap-6 lg:grid-cols-2">
+        <div>
+          <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">Előzmény hatókör</p>
+          <div class="relative mt-2 w-full" data-select="">
+            <button class="flex w-full items-center justify-between gap-3 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-left text-sm text-zinc-200 transition hover:border-white/15 focus:outline-none focus:ring-2 focus:ring-lime-300/25">
+              <span data-label="" class="truncate">Csak az adott szezon (szezononként nulláz)</span>
+              <iconify-icon data-chev="" icon="solar:alt-arrow-down-linear" width="16" class="shrink-0 text-zinc-500 transition-transform duration-200"></iconify-icon>
+            </button>
+            <div data-menu="" class="invisible absolute z-20 mt-2 w-full origin-top scale-95 overflow-hidden rounded-lg border border-white/[0.08] bg-[#101114] p-1 opacity-0 shadow-2xl transition-all duration-150">
+              <button data-opt="" class="w-full rounded-md px-3 py-2 text-left text-sm text-lime-200 transition hover:bg-white/[0.05]">Csak az adott szezon (szezononként nulláz)</button>
+              <button data-opt="" class="w-full rounded-md px-3 py-2 text-left text-sm text-zinc-300 transition hover:bg-white/[0.05]">Teljes előzmény (kumulatív)</button>
+              <button data-opt="" class="w-full rounded-md px-3 py-2 text-left text-sm text-zinc-300 transition hover:bg-white/[0.05]">Csúszó ablak — utolsó 380 meccs</button>
+            </div>
+          </div>
+          <p class="mt-2 text-xs leading-relaxed text-zinc-500">A hatókör szabja meg, mennyi korábbi mérkőzést lát az as-of feature vektor. Módosítása teljes újraszámítást indít.</p>
+        </div>
+
+        <div class="space-y-4">
+          <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">Import viselkedés</p>
+          <label data-checkbox="" aria-checked="false" class="group flex cursor-pointer items-start gap-3">
+            <span class="box mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded border border-white/15 bg-white/[0.04] transition group-hover:border-lime-300/50">
+              <span class="ic h-2.5 w-1.5 rotate-45 scale-50 border-b-2 border-r-2 border-[#0b0f04] opacity-0 transition" style="margin-top:-2px"></span>
+            </span>
+            <span>
+              <span class="block text-sm font-medium text-zinc-200">Ismétlődő import engedélyezése</span>
+              <span class="mt-1 block text-xs leading-relaxed text-zinc-500">Alapból a tartalmilag azonos szezonok kimaradnak. Bekapcsolva a hash-azonos fájl is új szezonként rögzül.</span>
+            </span>
+          </label>
+          <label data-checkbox="" aria-checked="false" class="group flex cursor-pointer items-start gap-3">
+            <span class="box mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded border border-white/15 bg-white/[0.04] transition group-hover:border-lime-300/50">
+              <span class="ic h-2.5 w-1.5 rotate-45 scale-50 border-b-2 border-r-2 border-[#0b0f04] opacity-0 transition" style="margin-top:-2px"></span>
+            </span>
+            <span>
+              <span class="block text-sm font-medium text-zinc-200">In-sample T összehasonlítás</span>
+              <span class="mt-1 block text-xs leading-relaxed text-zinc-500">Az auditban a szivárgó, teljes mintán illesztett hőmérséklet is megjelenik a prequential T mellett — kizárólag referenciaként, predikcióra soha.</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-6 rounded-lg border border-white/[0.06] bg-white/[0.015] p-4 sm:p-5">
+        <p class="flex items-center gap-2 text-[0.8125rem] font-medium text-amber-200/90">
+          <iconify-icon icon="solar:danger-triangle-linear" width="15"></iconify-icon> Kísérleti modellágak — alapból kikapcsolva
+        </p>
+        <p class="mt-1.5 text-xs leading-relaxed text-zinc-500">Bekapcsolva sem lépnek élesbe: csak akkor módosítják az előrejelzést, ha a bootstrap konfidencia-intervallum kizárja a nullát.</p>
+        <div class="mt-4 grid gap-4 lg:grid-cols-2">
+          <label data-checkbox="" aria-checked="false" class="group flex cursor-pointer items-start gap-3">
+            <span class="box mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded border border-white/15 bg-white/[0.04] transition group-hover:border-lime-300/50">
+              <span class="ic h-2.5 w-1.5 rotate-45 scale-50 border-b-2 border-r-2 border-[#0b0f04] opacity-0 transition" style="margin-top:-2px"></span>
+            </span>
+            <span>
+              <span class="block text-sm font-medium text-zinc-200">Dixon-Coles ρ korrekció mérése</span>
+              <span class="mt-1 block text-xs leading-relaxed text-zinc-500">Az alacsony gólszámú cellák (0-0, 1-0, 0-1, 1-1) függőségi korrekcióját illeszti és méri a Poisson alapmodellhez képest.</span>
+            </span>
+          </label>
+          <label data-checkbox="" aria-checked="false" class="group flex cursor-pointer items-start gap-3">
+            <span class="box mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded border border-white/15 bg-white/[0.04] transition group-hover:border-lime-300/50">
+              <span class="ic h-2.5 w-1.5 rotate-45 scale-50 border-b-2 border-r-2 border-[#0b0f04] opacity-0 transition" style="margin-top:-2px"></span>
+            </span>
+            <span>
+              <span class="block text-sm font-medium text-zinc-200">Glicko-2 A/B mérés</span>
+              <span class="mt-1 block text-xs leading-relaxed text-zinc-500">Dinamikus rating párhuzamos ágon fut, külön kiértékeléssel; sosem kerül az M1 jellemzői közé, így nincs multikollinearitás.</span>
+            </span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- L2 — KPI -->
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div class="rounded-xl border border-white/[0.07] bg-white/[0.03] p-5 transition hover:border-white/[0.12]">
+        <div class="flex items-start justify-between gap-3">
+          <p class="flex items-center gap-2 text-[0.8125rem] font-medium text-zinc-400"><iconify-icon icon="solar:layers-minimalistic-linear" width="15" class="text-zinc-500"></iconify-icon> Összes szezon</p>
+          <span class="rounded border border-white/[0.07] bg-white/[0.03] px-1.5 py-0.5 font-['JetBrains_Mono'] text-xs text-zinc-500">db</span>
+        </div>
+        <p class="mt-4 font-['JetBrains_Mono'] text-3xl font-semibold tracking-tight tabular-nums text-white">17</p>
+        <p class="mt-2 text-xs text-zinc-500">4 080 mérkőzés · aktív liga: Angol</p>
+      </div>
+
+      <div class="rounded-xl border border-white/[0.07] bg-white/[0.03] p-5 transition hover:border-white/[0.12]">
+        <div class="flex items-start justify-between gap-3">
+          <p class="flex items-center gap-2 text-[0.8125rem] font-medium text-zinc-400"><iconify-icon icon="solar:flag-linear" width="15" class="text-zinc-500"></iconify-icon> Angol / Spanyol</p>
+          <span class="rounded border border-white/[0.07] bg-white/[0.03] px-1.5 py-0.5 font-['JetBrains_Mono'] text-xs text-zinc-500">db</span>
+        </div>
+        <p class="mt-4 font-['JetBrains_Mono'] text-3xl font-semibold tracking-tight tabular-nums text-white">17 <span class="text-zinc-700">/</span> <span class="text-zinc-600">0</span></p>
+        <p class="mt-2 text-xs text-zinc-500">Átlag 240 mérkőzés / szezon</p>
+      </div>
+
+      <div class="rounded-xl border border-white/[0.07] bg-white/[0.03] p-5 transition hover:border-white/[0.12]">
+        <div class="flex items-start justify-between gap-3">
+          <p class="flex items-center gap-2 text-[0.8125rem] font-medium text-zinc-400"><iconify-icon icon="solar:target-linear" width="15" class="text-zinc-500"></iconify-icon> Javaslati pontosság</p>
+          <span class="rounded border border-sky-400/20 bg-sky-400/[0.08] px-1.5 py-0.5 font-['JetBrains_Mono'] text-xs text-sky-300">arány</span>
+        </div>
+        <p class="mt-4 font-['JetBrains_Mono'] text-3xl font-semibold tracking-tight tabular-nums text-sky-300">59,4<span class="text-base font-normal text-zinc-600">%</span></p>
+        <p class="mt-2 text-xs text-zinc-500">Lefedettség 0,8% (32 / 4 080)</p>
+      </div>
+
+      <div class="rounded-xl border border-white/[0.07] bg-white/[0.03] p-5 transition hover:border-white/[0.12]">
+        <div class="flex items-start justify-between gap-3">
+          <p class="flex items-center gap-2 text-[0.8125rem] font-medium text-zinc-400"><iconify-icon icon="solar:graph-up-linear" width="15" class="text-zinc-500"></iconify-icon> Igazolt előny (B1)</p>
+          <span class="rounded border border-emerald-400/20 bg-emerald-400/[0.08] px-1.5 py-0.5 font-['JetBrains_Mono'] text-xs text-emerald-300">eltérés</span>
+        </div>
+        <p class="mt-4 font-['JetBrains_Mono'] text-3xl font-semibold tracking-tight tabular-nums text-emerald-300">+10,73<span class="text-base font-normal text-zinc-600">%</span></p>
+        <p class="mt-2 font-['JetBrains_Mono'] text-xs text-zinc-500">95% CI +9,15% → +12,34%</p>
+      </div>
+
+      <div class="rounded-xl border border-white/[0.07] bg-white/[0.03] p-5 transition hover:border-white/[0.12]">
+        <div class="flex items-start justify-between gap-3">
+          <p class="flex items-center gap-2 text-[0.8125rem] font-medium text-zinc-400"><iconify-icon icon="solar:tuning-2-linear" width="15" class="text-zinc-500"></iconify-icon> Kalibráció</p>
+          <span class="rounded border border-white/[0.07] bg-white/[0.03] px-1.5 py-0.5 font-['JetBrains_Mono'] text-xs text-zinc-500">param</span>
+        </div>
+        <p class="mt-4 font-['JetBrains_Mono'] text-3xl font-semibold tracking-tight tabular-nums text-white">1,15<span class="text-base font-normal text-zinc-600"> T</span></p>
+        <p class="mt-2 flex items-center gap-1.5 text-xs text-zinc-500"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> ECE 0,001 · cél &lt; 0,05</p>
+      </div>
+    </section>
+
+    <!-- CALIBRATION -->
+    <section class="overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02]">
+      <div class="border-b border-white/[0.06] p-5 sm:p-6">
+        <h2 class="text-base font-semibold tracking-tight text-white">Empirikus kalibrációs sáv-tábla</h2>
+        <p class="mt-1.5 max-w-3xl text-[0.8125rem] leading-relaxed text-zinc-500">Konfidencia-sávonként a jelzett és a tényleges beválás. Az eltérés a Wilson 95% hibahatárral együtt értelmezendő; minimális értékelhető minta 20 eset.</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[60rem] text-left">
+          <thead>
+            <tr class="border-b border-white/[0.06] text-[0.8125rem] font-medium text-zinc-500">
+              <th class="px-6 py-3 font-medium">Konfidencia sáv</th>
+              <th class="px-4 py-3 text-center font-medium">Minta (N)</th>
+              <th class="px-4 py-3 text-center font-medium">Jelzett p</th>
+              <th class="px-4 py-3 text-center font-medium">Tényleges</th>
+              <th class="px-4 py-3 text-center font-medium">Wilson 95% CI</th>
+              <th class="px-4 py-3 text-center font-medium">Eltérés</th>
+              <th class="px-6 py-3 text-right font-medium">Diagnózis</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-white/[0.04] bg-white/[0.012]">
+              <td class="px-6 py-3.5"><span class="font-medium text-zinc-500">Magas</span> <span class="font-['JetBrains_Mono'] text-xs text-zinc-600">(76–100)</span></td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] tabular-nums text-zinc-500">0</td>
+              <td class="px-4 py-3.5 text-center text-zinc-700">—</td>
+              <td class="px-4 py-3.5 text-center text-zinc-700">—</td>
+              <td class="px-4 py-3.5 text-center text-xs italic text-zinc-600">nincs elég eset</td>
+              <td class="px-4 py-3.5 text-center text-zinc-700">—</td>
+              <td class="px-6 py-3.5 text-right"><span class="rounded border border-white/[0.07] bg-white/[0.02] px-2 py-1 text-xs text-zinc-600">Nem értékelhető</span></td>
+            </tr>
+            <tr class="border-b border-white/[0.04] bg-white/[0.012]">
+              <td class="px-6 py-3.5"><span class="font-medium text-zinc-500">Jó</span> <span class="font-['JetBrains_Mono'] text-xs text-zinc-600">(56–75)</span></td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] tabular-nums text-zinc-500">0</td>
+              <td class="px-4 py-3.5 text-center text-zinc-700">—</td>
+              <td class="px-4 py-3.5 text-center text-zinc-700">—</td>
+              <td class="px-4 py-3.5 text-center text-xs italic text-zinc-600">nincs elég eset</td>
+              <td class="px-4 py-3.5 text-center text-zinc-700">—</td>
+              <td class="px-6 py-3.5 text-right"><span class="rounded border border-white/[0.07] bg-white/[0.02] px-2 py-1 text-xs text-zinc-600">Nem értékelhető</span></td>
+            </tr>
+            <tr class="border-b border-white/[0.04] transition hover:bg-white/[0.02]">
+              <td class="px-6 py-3.5"><span class="font-medium text-white">Mérsékelt</span> <span class="font-['JetBrains_Mono'] text-xs text-zinc-500">(36–55)</span></td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] tabular-nums text-zinc-300">26</td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] tabular-nums text-zinc-300">64,5%</td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] tabular-nums text-zinc-300">53,8%</td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] text-xs tabular-nums text-zinc-500">35,5% – 71,2%</td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] font-medium tabular-nums text-emerald-300">+10,7 pp</td>
+              <td class="px-6 py-3.5 text-right"><span class="rounded border border-emerald-400/20 bg-emerald-400/[0.08] px-2 py-1 text-xs text-emerald-300">Jól kalibrált</span></td>
+            </tr>
+            <tr class="transition hover:bg-white/[0.02]">
+              <td class="px-6 py-3.5"><span class="font-medium text-white">Alacsony</span> <span class="font-['JetBrains_Mono'] text-xs text-zinc-500">(0–35)</span></td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] tabular-nums text-zinc-300">4 054</td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] tabular-nums text-zinc-300">44,5%</td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] tabular-nums text-zinc-300">46,7%</td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] text-xs tabular-nums text-zinc-500">45,1% – 48,2%</td>
+              <td class="px-4 py-3.5 text-center font-['JetBrains_Mono'] font-medium tabular-nums text-rose-300">−2,1 pp</td>
+              <td class="px-6 py-3.5 text-right"><span class="rounded border border-amber-300/20 bg-amber-300/[0.07] px-2 py-1 text-xs text-amber-200">Zaj (hidegindítás)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEASON SELECTOR -->
+    <section class="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-[0.8125rem] font-medium text-zinc-300">Szezonválasztó — Premier League</p>
+          <p class="mt-1 text-xs text-zinc-500">Minden szezon önálló as-of szekvencia (~240 mérkőzés).</p>
+        </div>
+        <button class="text-xs font-medium text-zinc-500 transition hover:text-rose-300">Aktív szezon törlése</button>
+      </div>
+      <div class="relative mt-4">
+        <div id="chips" class="flex gap-2 overflow-x-auto pb-1 pr-10 [&amp;::-webkit-scrollbar]:h-1 [&amp;::-webkit-scrollbar-thumb]:rounded-full [&amp;::-webkit-scrollbar-thumb]:bg-white/10"></div>
+        <div class="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#0a0b0d] to-transparent"></div>
+      </div>
+    </section>
+
+    <!-- L3 — LEAGUE TABLE -->
+    <section class="overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02]">
+      <div class="flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.06] p-5 sm:p-6">
+        <div>
+          <h2 id="leagueTitle" class="text-base font-semibold tracking-tight text-white">Premier League 2024/25 — tabella</h2>
+          <p id="leagueMeta" class="mt-1 text-xs text-zinc-500">240 mérkőzés · forrás: <span class="font-['JetBrains_Mono']">pl_2425.csv</span></p>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="flex items-center gap-1.5 text-xs text-zinc-500"><span class="h-3 w-0.5 rounded-full bg-sky-400"></span> BL-helyek</span>
+          <span class="flex items-center gap-1.5 text-xs text-zinc-500"><span class="h-3 w-0.5 rounded-full bg-rose-400"></span> Kiesőzóna</span>
+          <span class="rounded-md border border-white/[0.07] bg-white/[0.03] px-2.5 py-1 font-['JetBrains_Mono'] text-xs text-zinc-400">as-of · MD 30</span>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[62rem] text-left">
+          <thead>
+            <tr class="border-b border-white/[0.06] text-[0.8125rem] font-medium text-zinc-500">
+              <th class="px-6 py-3 font-medium">#</th>
+              <th class="px-4 py-3 font-medium">Csapat</th>
+              <th class="px-4 py-3 text-center font-medium">M</th>
+              <th class="px-4 py-3 text-center font-medium">Gy</th>
+              <th class="px-4 py-3 text-center font-medium">D</th>
+              <th class="px-4 py-3 text-center font-medium">V</th>
+              <th class="px-4 py-3 text-center font-medium">Gólok</th>
+              <th class="px-4 py-3 text-center font-medium">GK</th>
+              <th class="px-4 py-3 text-center font-medium">Pont</th>
+              <th class="px-4 py-3 text-center font-medium">Súly (w)</th>
+              <th class="px-4 py-3 text-center font-medium">Hazai erő</th>
+              <th class="px-6 py-3 text-right font-medium">Idegen erő</th>
+            </tr>
+          </thead>
+          <tbody id="league" class="text-sm"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- L3 — MATCH LOG -->
+    <section class="overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02]">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.06] p-5 sm:p-6">
+        <div>
+          <h2 class="text-base font-semibold tracking-tight text-white">Mérkőzésnapló &amp; pipeline javaslatok</h2>
+          <p class="mt-1 text-xs text-zinc-500">Valószínűségek: hazai (1) · döntetlen (X) · vendég (2)</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="relative">
+            <iconify-icon icon="solar:magnifer-linear" width="15" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></iconify-icon>
+            <input id="search" type="text" placeholder="Keresés csapatnévre…" class="w-52 rounded-lg border border-white/[0.08] bg-white/[0.03] py-2 pl-9 pr-3 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-600 focus:border-lime-300/40 focus:bg-white/[0.05]">
+          </div>
+          <div class="flex items-center gap-1 rounded-lg border border-white/[0.07] bg-white/[0.025] p-0.5">
+            <button data-den="compact" class="rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-500 transition hover:text-zinc-200">Kompakt</button>
+            <button data-den="comfort" class="rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-500 transition hover:text-zinc-200">Kényelmes</button>
+          </div>
+          <span class="rounded-md border border-white/[0.07] bg-white/[0.03] px-2.5 py-1 font-['JetBrains_Mono'] text-xs text-zinc-400">240 / 240</span>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[80rem] text-left">
+          <thead>
+            <tr class="border-b border-white/[0.06] text-[0.8125rem] font-medium text-zinc-500">
+              <th class="px-6 py-3 font-medium">#</th>
+              <th class="px-4 py-3 font-medium">Kezdés</th>
+              <th class="px-4 py-3 text-right font-medium">Hazai</th>
+              <th class="px-4 py-3 text-center font-medium">FT</th>
+              <th class="px-4 py-3 font-medium">Vendég</th>
+              <th class="px-4 py-3 text-center font-medium">Adatszint</th>
+              <th class="px-4 py-3 text-center font-medium">B1 Poisson</th>
+              <th class="px-4 py-3 text-center font-medium">M1 Logreg</th>
+              <th class="px-4 py-3 text-center font-medium text-zinc-300">WinMix ens. (kalibrált)</th>
+              <th class="px-4 py-3 text-center font-medium">Konfidencia</th>
+              <th class="px-4 py-3 font-medium">Javaslat</th>
+              <th class="px-6 py-3 text-right font-medium">Audit</th>
+            </tr>
+          </thead>
+          <tbody id="matches" class="text-sm"></tbody>
+        </table>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] px-6 py-4">
+        <p class="text-xs text-zinc-500">10 sor megjelenítve · 240 mérkőzésből</p>
+        <div class="flex items-center gap-1.5">
+          <button class="grid h-8 w-8 place-items-center rounded-lg border border-white/[0.07] bg-white/[0.025] text-zinc-500 transition hover:text-zinc-100"><iconify-icon icon="solar:alt-arrow-left-linear" width="15"></iconify-icon></button>
+          <button class="h-8 w-8 rounded-lg border border-lime-300/25 bg-lime-300/[0.1] font-['JetBrains_Mono'] text-xs text-lime-200">1</button>
+          <button class="h-8 w-8 rounded-lg border border-white/[0.07] bg-white/[0.025] font-['JetBrains_Mono'] text-xs text-zinc-500 transition hover:text-zinc-100">2</button>
+          <button class="h-8 w-8 rounded-lg border border-white/[0.07] bg-white/[0.025] font-['JetBrains_Mono'] text-xs text-zinc-500 transition hover:text-zinc-100">3</button>
+          <button class="grid h-8 w-8 place-items-center rounded-lg border border-white/[0.07] bg-white/[0.025] text-zinc-500 transition hover:text-zinc-100"><iconify-icon icon="solar:alt-arrow-right-linear" width="15"></iconify-icon></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- L4 — DIAGNOSTICS -->
+    <div class="grid gap-4 lg:grid-cols-2">
+      <details class="group rounded-lg border border-white/[0.05] bg-white/[0.012] px-5 py-4">
+        <summary class="flex cursor-pointer list-none items-center gap-2 text-[0.8125rem] text-zinc-500 transition hover:text-zinc-300 [&amp;::-webkit-details-marker]:hidden">
+          <iconify-icon icon="solar:alt-arrow-right-linear" width="15" class="transition-transform duration-200 group-open:rotate-90"></iconify-icon>
+          Import diagnosztika
+          <span class="ml-auto rounded border border-white/[0.07] bg-white/[0.03] px-1.5 py-0.5 font-['JetBrains_Mono'] text-xs text-zinc-500">53 bejegyzés</span>
+        </summary>
+        <ul class="mt-4 space-y-2 border-l border-white/[0.06] pl-4 font-['JetBrains_Mono'] text-xs leading-relaxed text-zinc-500">
+          <li>14:02:11 · pl_2425.csv — 240 sor beolvasva, 0 duplikátum</li>
+          <li>14:02:12 · pl_2324.csv — 240 sor beolvasva, 2 sor normalizálva</li>
+          <li>14:02:14 · pl_2223.csv — hiányos dátumformátum javítva (ISO-8601)</li>
+          <li>14:02:15 · sémavalidáció rendben, 17 szezon rögzítve</li>
+        </ul>
+      </details>
+
+      <details class="group rounded-lg border border-white/[0.05] bg-white/[0.012] px-5 py-4">
+        <summary class="flex cursor-pointer list-none items-center gap-2 text-[0.8125rem] text-zinc-500 transition hover:text-zinc-300 [&amp;::-webkit-details-marker]:hidden">
+          <iconify-icon icon="solar:alt-arrow-right-linear" width="15" class="transition-transform duration-200 group-open:rotate-90"></iconify-icon>
+          Változásnapló — v1 → v2 (Part A)
+        </summary>
+        <ul class="mt-4 space-y-2 border-l border-white/[0.06] pl-4 text-xs leading-relaxed text-zinc-500">
+          <li>As-of feature vektor szezononkénti nullázása; szivárgásmentes prequential kiértékelés.</li>
+          <li>Wilson 95% CI a kalibrációs sávokra, 20 eset alatti minta külön jelölve.</li>
+          <li>Temperature scaling (T = 1,15) az ensemble kimenetére, ECE 0,001-re csökkent.</li>
+          <li>Párhuzamos CSV beolvasás korlátozott worker-poollal (50–100 fájl / batch).</li>
+        </ul>
+      </details>
+    </div>
+
+    <p class="pb-6 pt-2 text-center font-['JetBrains_Mono'] text-xs text-zinc-600">WinMix Studio · as-of predikciós pipeline · build 2.0.148</p>
+  </main>
+</div>
+
+<script>
+/* ---------- league table ---------- */
+const league = [
+  [1,'London Ágyúk',30,17,6,7,'51:26','+25',57,'5.0','1.73','1.67'],
+  [2,'Liverpool',30,17,4,9,'51:35','+16',55,'5.0','2.00','1.40'],
+  [3,'Manchester Kék',30,16,5,9,'49:35','+14',53,'5.0','1.60','1.67'],
+  [4,'Vörös Ördögök',30,16,4,10,'47:33','+14',52,'5.0','1.47','1.67'],
+  [5,'Chelsea',30,15,5,10,'41:34','+7',50,'5.0','1.60','1.13'],
+  [6,'Tottenham',30,13,8,9,'38:32','+6',47,'5.0','1.13','1.40'],
+  [7,'Everton',30,9,14,7,'36:32','+4',41,'5.0','1.47','0.93'],
+  [8,'Wolverhampton',30,11,7,12,'30:42','−12',40,'5.0','1.13','0.87'],
+  [9,'Newcastle',30,10,8,12,'35:42','−7',38,'5.0','1.33','1.00'],
+  [10,'Brentford',30,9,10,11,'30:29','+1',37,'5.0','1.27','0.73'],
+  [11,'Nottingham',30,9,10,11,'33:36','−3',37,'5.0','0.87','1.33'],
+  [12,'West Ham',30,9,7,14,'41:47','−6',34,'5.0','1.47','1.27'],
+  [13,'Fulham',30,9,5,16,'32:43','−11',32,'5.0','1.27','0.87'],
+  [14,'Aston Oroszlán',30,7,9,14,'25:36','−11',30,'5.0','0.87','0.80']
+];
+const mono = "font-['JetBrains_Mono'] tabular-nums";
+document.getElementById('league').innerHTML = league.map((r,i)=>{
+  const gd = r[7].startsWith('+') ? 'text-emerald-300' : 'text-rose-300';
+  const mark = r[0]<=4 ? 'border-l-2 border-sky-400' : (r[0]>=13 ? 'border-l-2 border-rose-400' : 'border-l-2 border-transparent');
+  return `<tr class="border-b border-white/[0.04] transition hover:bg-white/[0.02] last:border-0">
+    <td class="py-3.5 pl-6 pr-4 ${mono} text-zinc-500 ${mark}">${r[0]}</td>
+    <td class="px-4 py-3.5 font-medium text-white">${r[1]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} text-zinc-500">${r[2]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} text-zinc-300">${r[3]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} text-zinc-400">${r[4]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} text-zinc-400">${r[5]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} text-zinc-300">${r[6]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} ${gd}">${r[7]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} font-semibold text-white">${r[8]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} text-zinc-500">${r[9]}</td>
+    <td class="px-4 py-3.5 text-center ${mono} text-zinc-400">${r[10]}</td>
+    <td class="px-6 py-3.5 text-right ${mono} text-zinc-400">${r[11]}</td>
+  </tr>`;
+}).join('');
+
+/* ---------- match log ---------- */
+const bar = (p, primary=false) => {
+  const seg = primary
+    ? ['bg-zinc-100','bg-white/30','bg-white/12']
+    : ['bg-sky-400/75','bg-white/20','bg-sky-400/25'];
+  const txt = primary ? 'text-zinc-200 font-medium' : 'text-zinc-400';
+  return `<div class="mx-auto w-28">
+    <div class="flex h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+      <div style="width:${p[0]}%" class="${seg[0]}"></div>
+      <div style="width:${p[1]}%" class="${seg[1]}"></div>
+      <div style="width:${p[2]}%" class="${seg[2]}"></div>
+    </div>
+    <div data-detail class="mt-1.5 grid grid-cols-3 ${mono} text-xs">
+      <span class="text-left ${txt}"><span class="text-zinc-600">1</span> ${p[0]}</span>
+      <span class="text-center ${txt}"><span class="text-zinc-600">X</span> ${p[1]}</span>
+      <span class="text-right ${txt}"><span class="text-zinc-600">2</span> ${p[2]}</span>
+    </div>
+  </div>`;
+};
+const conf = v => {
+  if(v>=40) return `<span class="inline-flex items-center gap-1.5 rounded border border-emerald-400/20 bg-emerald-400/[0.08] px-2 py-1 ${mono} text-xs text-emerald-300"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>${v} magas</span>`;
+  if(v>=20) return `<span class="inline-flex items-center gap-1.5 rounded border border-sky-400/20 bg-sky-400/[0.08] px-2 py-1 ${mono} text-xs text-sky-300"><span class="h-1.5 w-1.5 rounded-full bg-sky-400"></span>${v} közepes</span>`;
+  return `<span class="inline-flex items-center gap-1.5 rounded border border-white/[0.07] bg-white/[0.02] px-2 py-1 ${mono} text-xs text-zinc-500"><span class="h-1.5 w-1.5 rounded-full bg-zinc-600"></span>${v} alacsony</span>`;
+};
+const matches = [
+  [1,'12:30','Nottingham','0 – 0','Brentford','cold',[63,21,16],[49,25,27],[58,23,19],12,''],
+  [2,'15:00','Brighton','2 – 0','Vörös Ördögök','warm',[20,60,20],[34,38,28],[27,49,24],18,''],
+  [3,'15:00','Manchester Kék','2 – 1','London Ágyúk','warm',[78,17,5],[54,23,23],[67,20,13],44,'Hazai (1) · +4,2 pp él'],
+  [4,'15:00','Tottenham','0 – 1','Wolverhampton','cold',[94,5,1],[60,19,21],[78,12,10],31,'Hazai (1) · +2,1 pp él'],
+  [5,'17:30','Fulham','3 – 1','Crystal Palace','warm',[78,17,5],[54,23,23],[66,20,14],26,''],
+  [6,'17:30','West Ham','1 – 4','Liverpool','hot',[9,16,75],[24,26,50],[16,21,63],41,'Vendég (2) · +5,8 pp él'],
+  [7,'20:00','Chelsea','4 – 0','Newcastle','warm',[49,26,25],[44,26,30],[47,26,27],14,''],
+  [8,'20:00','Aston Oroszlán','1 – 1','Everton','cold',[85,11,5],[57,21,23],[71,16,13],22,''],
+  [9,'13:00','Wolverhampton','0 – 4','Chelsea','warm',[80,13,6],[55,22,23],[68,17,15],19,''],
+  [10,'16:00','Liverpool','2 – 1','Fulham','hot',[45,25,30],[43,26,31],[44,26,30],11,'']
+];
+const suff = {
+  cold:['border-white/[0.07] bg-white/[0.02] text-zinc-500','Hideg'],
+  warm:['border-sky-400/20 bg-sky-400/[0.08] text-sky-300','Részleges'],
+  hot:['border-emerald-400/20 bg-emerald-400/[0.08] text-emerald-300','Teljes']
+};
+document.getElementById('matches').innerHTML = matches.map(r=>`
+  <tr data-teams="${(r[2]+' '+r[4]).toLowerCase()}" class="border-b border-white/[0.04] transition last:border-0 hover:bg-white/[0.02]">
+    <td class="px-6 py-3.5 ${mono} text-zinc-600">${r[0]}</td>
+    <td class="px-4 py-3.5 ${mono} text-zinc-500">${r[1]}</td>
+    <td class="px-4 py-3.5 text-right font-medium text-white">${r[2]}</td>
+    <td class="px-4 py-3.5 text-center"><span class="rounded border border-white/[0.07] bg-white/[0.04] px-2 py-1 ${mono} text-xs text-zinc-200">${r[3]}</span></td>
+    <td class="px-4 py-3.5 font-medium text-white">${r[4]}</td>
+    <td class="px-4 py-3.5 text-center"><span class="rounded border px-2 py-1 text-xs ${suff[r[5]][0]}">${suff[r[5]][1]}</span></td>
+    <td class="px-4 py-3.5">${bar(r[6])}</td>
+    <td class="px-4 py-3.5">${bar(r[7])}</td>
+    <td class="px-4 py-3.5 bg-white/[0.012]">${bar(r[8],true)}</td>
+    <td class="px-4 py-3.5 text-center">${conf(r[9])}</td>
+    <td class="px-4 py-3.5 text-[0.8125rem] ${r[10]?'text-emerald-300':'text-zinc-600'}">${r[10]||'Nincs kimutatható él'}</td>
+    <td class="px-6 py-3.5 text-right"><button class="rounded-md border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-xs text-zinc-400 transition hover:border-lime-300/30 hover:bg-lime-300/[0.08] hover:text-lime-200 focus:outline-none focus:ring-2 focus:ring-lime-300/25">Audit</button></td>
+  </tr>`).join('');
+
+/* ---------- seasons ---------- */
+const seasons = [
+  ['2024/25','pl_2425.csv',240],['2023/24','pl_2324.csv',240],['2022/23','pl_2223.csv',240],
+  ['2021/22','pl_2122.csv',240],['2020/21','pl_2021.csv',240],['2019/20','pl_1920.csv',238],
+  ['2018/19','pl_1819.csv',240],['2017/18','pl_1718.csv',240],['2016/17','pl_1617.csv',240],
+  ['2015/16','pl_1516.csv',240],['2014/15','pl_1415.csv',240]
+];
+const chips = document.getElementById('chips');
+const renderChips = (activeIdx=0) => {
+  chips.innerHTML = seasons.map((s,i)=>`
+    <button data-chip="${i}" class="flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-[0.8125rem] transition focus:outline-none focus:ring-2 focus:ring-lime-300/25 ${
+      i===activeIdx
+      ? 'border-lime-300/30 bg-lime-300/[0.1] text-lime-100'
+      : 'border-white/[0.07] bg-white/[0.02] text-zinc-400 hover:border-white/15 hover:text-zinc-100'}">
+      <span class="font-medium ${mono}">${s[0]}</span>
+      <span class="rounded px-1.5 py-0.5 ${mono} text-xs ${i===activeIdx?'bg-lime-300/15 text-lime-200':'bg-white/[0.05] text-zinc-500'}">${s[2]} M</span>
+    </button>`).join('');
+  chips.querySelectorAll('[data-chip]').forEach(b=>b.addEventListener('click',()=>{
+    const i = +b.dataset.chip;
+    renderChips(i);
+    document.getElementById('leagueTitle').textContent = `Premier League ${seasons[i][0]} — tabella`;
+    document.getElementById('leagueMeta').innerHTML = `${seasons[i][2]} mérkőzés · forrás: <span class="font-['JetBrains_Mono']">${seasons[i][1]}</span>`;
+  }));
+};
+renderChips();
+
+/* ---------- density ---------- */
+const denBtns = document.querySelectorAll('[data-den]');
+const setDensity = mode => {
+  denBtns.forEach(b=>{
+    const on = b.dataset.den===mode;
+    b.className = `rounded-md px-2.5 py-1.5 text-xs font-medium transition ${on?'bg-white/[0.07] text-zinc-100':'text-zinc-500 hover:text-zinc-200'}`;
+  });
+  document.querySelectorAll('#matches td').forEach(td=>{
+    td.classList.toggle('py-3.5', mode==='comfort');
+    td.classList.toggle('py-2', mode!=='comfort');
+  });
+  document.querySelectorAll('[data-detail]').forEach(d=>d.classList.toggle('hidden', mode!=='comfort'));
+};
+denBtns.forEach(b=>b.addEventListener('click',()=>setDensity(b.dataset.den)));
+setDensity('comfort');
+
+/* ---------- search ---------- */
+document.getElementById('search').addEventListener('input', e=>{
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('#matches tr').forEach(tr=>{
+    tr.style.display = tr.dataset.teams.includes(q) ? '' : 'none';
+  });
+});
+
+/* ---------- checkboxes ---------- */
+document.querySelectorAll('[data-checkbox]').forEach(el=>{
+  el.addEventListener('click',e=>{
+    e.preventDefault();
+    const on = el.getAttribute('aria-checked')==='true';
+    el.setAttribute('aria-checked', String(!on));
+    const box = el.querySelector('.box'), ic = el.querySelector('.ic');
+    if(!on){
+      box.classList.add('bg-lime-300','border-lime-300');
+      box.classList.remove('bg-white/[0.04]','border-white/15');
+      ic.classList.remove('opacity-0','scale-50');
+    }else{
+      box.classList.remove('bg-lime-300','border-lime-300');
+      box.classList.add('bg-white/[0.04]','border-white/15');
+      ic.classList.add('opacity-0','scale-50');
+    }
+  });
+});
+
+/* ---------- selects ---------- */
+document.querySelectorAll('[data-select]').forEach(sel=>{
+  const btn = sel.querySelector('button'), menu = sel.querySelector('[data-menu]'),
+        chev = sel.querySelector('[data-chev]'), label = sel.querySelector('[data-label]');
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const hidden = menu.classList.contains('invisible');
+    document.querySelectorAll('[data-menu]').forEach(m=>m.classList.add('invisible','opacity-0','scale-95'));
+    document.querySelectorAll('[data-chev]').forEach(c=>c.classList.remove('rotate-180'));
+    if(hidden){menu.classList.remove('invisible','opacity-0','scale-95'); chev.classList.add('rotate-180');}
+  });
+  menu.querySelectorAll('[data-opt]').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      label.textContent = opt.textContent;
+      menu.querySelectorAll('[data-opt]').forEach(o=>{
+        o.classList.remove('text-lime-200');
+        o.classList.add('text-zinc-300');
+      });
+      opt.classList.remove('text-zinc-300');
+      opt.classList.add('text-lime-200');
+      menu.classList.add('invisible','opacity-0','scale-95');
+      chev.classList.remove('rotate-180');
+    });
+  });
+});
+document.addEventListener('click',()=>{
+  document.querySelectorAll('[data-menu]').forEach(m=>m.classList.add('invisible','opacity-0','scale-95'));
+  document.querySelectorAll('[data-chev]').forEach(c=>c.classList.remove('rotate-180'));
+});
+
+/* ---------- segmented ---------- */
+document.querySelectorAll('[data-seg]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    btn.parentElement.querySelectorAll('[data-seg]').forEach(b=>{
+      b.className = 'rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-500 ring-1 ring-inset ring-transparent transition h
+
+/* ---------- toggle ---------- */
+document.querySelectorAll('[data-toggle]').forEach(t=>{
+  t.addEventListener('click',()=>{
+    const on = t.getAttribute('aria-checked')==='true';
+    t.setAttribute('aria-checked', String(!on));
+    const knob = t.querySelector('.knob');
+    if(on){
+      t.className = 'relative h-[18px] w-8 rounded-full border border-white/15 bg-white/[0.06] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-lime-300/30';
+      knob.className = 'knob absolute top-[1px] left-[1px] h-3.5 w-3.5 rounded-full bg-zinc-500 transition-all duration-200';
+    }else{
+      t.className = 'relative h-[18px] w-8 rounded-full border border-lime-300/35 bg-lime-300/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-lime-300/30';
+      knob.className = 'knob absolute top-[1px] left-[15px] h-3.5 w-3.5 rounded-full bg-lime-300 transition-all duration-200';
+    }
+  });
+});
+</script>
+
+</body></html>
